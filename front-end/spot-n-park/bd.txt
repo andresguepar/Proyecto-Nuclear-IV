@@ -1,0 +1,146 @@
+-- Migrations will appear here as you chat with AI asdfui7y
+
+create table roles (
+  id bigint primary key generated always as identity,
+  name text not null,
+  status text not null
+);
+
+create table users (
+  id bigint primary key generated always as identity,
+  id_role bigint references roles (id),
+  username text not null,
+  password text not null,
+  email text not null,
+  identification text not null,
+  phone text not null,
+  status text not null
+);
+
+create table vehicle_types (
+  id bigint primary key generated always as identity,
+  name text not null,
+  status text not null
+);
+
+create table parking_lots (
+  id bigint primary key generated always as identity,
+  id_admin bigint references users (id),
+  address text not null,
+  coord_x double precision not null,
+  coord_y double precision not null,
+  name text not null,
+  nit text not null,
+  phone text not null,
+  status text not null
+);
+
+create table slots (
+  id bigint primary key generated always as identity,
+  id_parking_lot bigint references parking_lots (id),
+  id_vehicle_type bigint references vehicle_types (id),
+  name text not null,
+  status text not null
+);
+
+create table payment_methods (
+  id bigint primary key generated always as identity,
+  name text not null,
+  status text not null
+);
+
+create table standard_fees (
+  id bigint primary key generated always as identity,
+  id_parking_lot bigint references parking_lots (id),
+  id_vehicle_type bigint references vehicle_types (id),
+  price_x_hours double precision not null,
+  is_12_hours boolean not null,
+  price_x_12_hours double precision,
+  status text not null
+);
+
+create table monthly_fees (
+  id bigint primary key generated always as identity,
+  id_parking_lot bigint references parking_lots (id),
+  id_vehicle_type bigint references vehicle_types (id),
+  price double precision not null,
+  status text not null
+);
+
+create table add_on_services_fees (
+  id bigint primary key generated always as identity,
+  total double precision not null,
+  add_on_services bigint[0]
+);
+
+create table fees (
+  id bigint primary key generated always as identity,
+  id_standard_fee bigint references standard_fees (id),
+  id_monthly_fee bigint references monthly_fees (id),
+  id_add_on_service_fee bigint references add_on_services_fees (id)
+);
+
+create table payments (
+  id bigint primary key generated always as identity,
+  id_payment_methods bigint references payment_methods (id),
+  date timestamp with time zone not null,
+  id_fee bigint references fees (id),
+  status text not null
+);
+
+create table add_on_services (
+  id bigint primary key generated always as identity,
+  id_parking_lot bigint references parking_lots (id),
+  id_vehicle_type bigint references vehicle_types (id),
+  price double precision not null,
+  name text not null,
+  status text not null
+);
+
+create table status_reservation (
+  id bigint primary key generated always as identity,
+  name text not null
+);
+
+create table standard_reservations (
+  id bigint primary key generated always as identity,
+  id_slot bigint references slots (id),
+  id_user bigint references users (id),
+  id_payment bigint references payments (id),
+  scheduled_date_time timestamp with time zone not null,
+  check_in timestamp with time zone,
+  check_out timestamp with time zone,
+  reservation_date timestamp with time zone not null,
+  id_status_reservation bigint references status_reservation (id)
+);
+
+create table monthly_reservations (
+  id bigint primary key generated always as identity,
+  id_slot bigint references slots (id),
+  id_user bigint references users (id),
+  id_payment bigint references payments (id),
+  reservation_date timestamp with time zone not null,
+  start_date timestamp with time zone not null,
+  end_date timestamp with time zone not null,
+  id_status_reservation bigint references status_reservation (id)
+);
+
+create table week_days (
+  id bigint primary key generated always as identity,
+  name text not null
+);
+
+create table schedules (
+  id bigint primary key generated always as identity,
+  id_parking_lot bigint references parking_lots (id),
+  status text not null
+);
+
+create table daily_schedules (
+  id bigint primary key generated always as identity,
+  id_schedule bigint references schedules (id),
+  start_time time not null,
+  end_time time not null,
+  id_week_day bigint references week_days (id),
+  status text not null
+);
