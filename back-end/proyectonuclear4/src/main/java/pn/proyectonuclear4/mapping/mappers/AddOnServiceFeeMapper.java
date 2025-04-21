@@ -15,6 +15,7 @@ public class AddOnServiceFeeMapper {
                 .total(source.getTotal())
                 .addOnServices(source.getAddOnServices())  // Si `addOnServices` es un string, se usa así
                 .isActive(source.getIsActive())
+                .standardReservation(source.getStandardReservation())
                 .build();
     }
 
@@ -24,6 +25,7 @@ public class AddOnServiceFeeMapper {
                 .total(source.total())
                 .addOnServices(source.addOnServices())
                 .isActive(source.isActive())
+                .standardReservation(source.standardReservation())
                 .build();
     }
 
