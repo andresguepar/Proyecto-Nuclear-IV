@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { mdiBookMarker, mdiPlus } from '@mdi/js'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
@@ -60,32 +60,32 @@ import CardBoxModal from '@/components/CardBoxModal.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import ReservationCard from '@/components/ReservationCard.vue'
 import StandardServiceForm from '@/components/StandardServiceForm.vue'
+import axios from 'axios'
 
 const router = useRouter()
-
-// Mock data - replace with actual API calls
-const reservations = ref([
-  {
-    id: 1,
-    parkingName: 'Downtown Parking',
-    address: '123 Main St, City',
-    date: '2024-03-20',
-    time: '14:30',
-    pricePerHour: 5.00
-  },
-  {
-    id: 2,
-    parkingName: 'Central Parking',
-    address: '456 Center Ave, City',
-    date: '2024-03-21',
-    time: '09:00',
-    pricePerHour: 4.50
-  }
-])
-
+const reservations = ref([])
 const showEditReservationModal = ref(false)
 const showCancelModal = ref(false)
 const selectedReservation = ref(null)
+
+const fetchReservations = async () => {
+  try {
+    const response = await axios.get('http://localhost:8080/standard-reservations/get')
+    reservations.value = response.data.map(reservation => ({
+      id: reservation.idStandardReservation,
+      parkingName: reservation.slot.parkingLot.name,
+      address: reservation.slot.parkingLot.address,
+      date: new Date(reservation.scheduledDateTime).toLocaleDateString(),
+      time: new Date(reservation.scheduledDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      pricePerHour: reservation.slot.parkingLot.pricePerHour,
+      slot: reservation.slot.number,
+      status: reservation.statusReservation.name,
+      plate: reservation.plate
+    }))
+  } catch (error) {
+    console.error('Error fetching reservations:', error)
+  }
+}
 
 const goToHome = () => {
   router.push('/home')
@@ -101,16 +101,33 @@ const handleCancel = (reservation) => {
   showCancelModal.value = true
 }
 
-const confirmCancel = () => {
-  // Remove the reservation from the list
-  reservations.value = reservations.value.filter(r => r.id !== selectedReservation.value.id)
-  showCancelModal.value = false
-  selectedReservation.value = null
+const confirmCancel = async () => {
+  try {
+    await axios.delete(`http://localhost:8080/standard-reservations/delete/${selectedReservation.value.id}`)
+    await fetchReservations() // Refresh the list
+    showCancelModal.value = false
+    selectedReservation.value = null
+  } catch (error) {
+    console.error('Error canceling reservation:', error)
+  }
 }
 
-const handleFormUpdate = (formData) => {
-  // Handle form submission - update or create reservation
-  console.log('Form data:', formData)
-  showEditReservationModal.value = false
+const handleFormUpdate = async (formData) => {
+  try {
+    // Update the reservation with the new data
+    const updatedReservation = {
+      ...selectedReservation.value,
+      ...formData
+    }
+    await axios.put(`http://localhost:8080/standard-reservations/update/${selectedReservation.value.id}`, updatedReservation)
+    await fetchReservations() // Refresh the list
+    showEditReservationModal.value = false
+  } catch (error) {
+    console.error('Error updating reservation:', error)
+  }
 }
+
+onMounted(() => {
+  fetchReservations()
+})
 </script> 

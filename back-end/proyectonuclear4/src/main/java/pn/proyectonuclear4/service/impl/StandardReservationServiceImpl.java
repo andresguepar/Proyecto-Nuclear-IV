@@ -32,6 +32,11 @@ public class StandardReservationServiceImpl implements StandardReservationServic
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private StatusReservationRepository statusReservationRepository;
+
+    @Autowired
+    private StandardReservationMapper standardReservationMapper;
 
     @Override
     public List<StandardReservationDto> getAllStandardReservations() {
@@ -53,13 +58,16 @@ public class StandardReservationServiceImpl implements StandardReservationServic
     }
 
     @Override
-    public void deleteStandardReservation(int id) {
+    public void deleteStandardReservation(int id) throws ResourceNotFoundException {
         StandardReservation standardReservation = standardReservationRepository.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("StandardReservation not found"));
-        standardReservation.getStatusReservation().setIdStatusReservation(1);
+                .orElseThrow(() -> new ResourceNotFoundException("Standard reservation not found with id: " + id));
+        
+        StatusReservation canceledStatus = statusReservationRepository.findByName("CANCELED")
+                .orElseThrow(() -> new ResourceNotFoundException("Status 'CANCELED' not found"));
+        
+        standardReservation.setStatusReservation(canceledStatus);
         standardReservationRepository.save(standardReservation);
     }
-
 
     @Override
     public List<StandardReservationDto> getStandardReservationsByUserId(int userId) {
@@ -71,5 +79,25 @@ public class StandardReservationServiceImpl implements StandardReservationServic
     public List<StandardReservationDto> getStandardReservationsByParkingLotIdAndDateRange(int parkingLotId, LocalDateTime startDate, LocalDateTime endDate) {
         List<StandardReservation> standardReservations = standardReservationRepository.findByParkingLotAndDateRange(parkingLotId, startDate, endDate);
         return StandardReservationMapper.mapFrom(standardReservations);
+    }
+
+    @Override
+    public StandardReservationDto updateStandardReservation(int id, StandardReservationDto standardReservationDto) throws ResourceNotFoundException {
+        StandardReservation existingReservation = standardReservationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Standard reservation not found with id: " + id));
+
+        // Update only the allowed fields
+        if (standardReservationDto.scheduledDateTime() != null) {
+            existingReservation.setScheduledDateTime(standardReservationDto.scheduledDateTime());
+        }
+        if (standardReservationDto.plate() != null) {
+            existingReservation.setPlate(standardReservationDto.plate());
+        }
+        if (standardReservationDto.slot() != null) {
+            existingReservation.setSlot(standardReservationDto.slot());
+        }
+
+        StandardReservation updatedReservation = standardReservationRepository.save(existingReservation);
+        return standardReservationMapper.toDto(updatedReservation);
     }
 }

@@ -45,6 +45,17 @@ public class StandardReservationController {
         }
     }
 
+    @PutMapping("/update/{id}")
+    public ResponseEntity<StandardReservationDto> updateStandardReservation(
+            @PathVariable int id,
+            @RequestBody StandardReservationDto standardReservationDto) {
+        try {
+            return ResponseEntity.ok(standardReservationService.updateStandardReservation(id, standardReservationDto));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<StandardReservationDto>> getStandardReservationsByUserId(@PathVariable int userId) {
         return ResponseEntity.ok(standardReservationService.getStandardReservationsByUserId(userId));

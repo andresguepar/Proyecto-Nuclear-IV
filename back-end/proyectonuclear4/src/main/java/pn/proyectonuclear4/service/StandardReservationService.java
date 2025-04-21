@@ -1,6 +1,7 @@
 package pn.proyectonuclear4.service;
 
 import pn.proyectonuclear4.mapping.dto.StandardReservationDto;
+import pn.proyectonuclear4.exception.ResourceNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,7 +15,9 @@ public interface StandardReservationService {
 
     StandardReservationDto saveStandardReservation(StandardReservationDto standardReservationDto);
 
-    void deleteStandardReservation(int id);
+    void deleteStandardReservation(int id) throws ResourceNotFoundException;
+
+    StandardReservationDto updateStandardReservation(int id, StandardReservationDto standardReservationDto) throws ResourceNotFoundException;
 
     List<StandardReservationDto> getStandardReservationsByUserId(int userId);
 

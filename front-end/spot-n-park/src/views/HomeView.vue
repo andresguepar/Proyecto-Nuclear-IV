@@ -8,7 +8,7 @@
         <span style="color: #e1ebf5;">Book </span>
         <span style="color: #2e76ae;">your spot, </span>
         <span style="color: #0e2338;">park without </span>
-        <span style="color: #ff8f2b;">spotjh</span>
+        <span style="color: #ff8f2b;">spot</span>
       </div>
 
       <!-- Tabs with Card -->

@@ -36,6 +36,22 @@
             />
             <span class="text-base text-gray-600">Slot: {{ reservation.slot }}</span>
           </div>
+          <div class="flex items-center space-x-2">
+            <BaseIcon
+              path="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"
+              class="w-6 h-6 text-gray-500"
+            />
+            <span class="text-base text-gray-600">Plate: {{ reservation.plate }}</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <BaseIcon
+              path="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              class="w-6 h-6 text-gray-500"
+            />
+            <span :class="getStatusClass(reservation.status)" class="text-base">
+              {{ reservation.status }}
+            </span>
+          </div>
         </div>
       </div>
     </CardBoxComponentBody>
@@ -44,11 +60,13 @@
         <BaseButton
           color="danger"
           label="Cancel"
+          :disabled="reservation.status === 'CANCELED'"
           @click="$emit('cancel', reservation)"
         />
         <BaseButton
           color="info"
           label="Edit"
+          :disabled="reservation.status === 'CANCELED'"
           @click="$emit('edit', reservation)"
         />
       </div>
@@ -62,7 +80,7 @@ import CardBoxComponentBody from '@/components/CardBoxComponentBody.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseIcon from '@/components/BaseIcon.vue'
 
-defineProps({
+const props = defineProps({
   reservation: {
     type: Object,
     required: true,
@@ -72,10 +90,25 @@ defineProps({
       date: '',
       time: '',
       pricePerHour: 0,
-      slot: ''
+      slot: '',
+      plate: '',
+      status: ''
     })
   }
 })
+
+const getStatusClass = (status) => {
+  switch (status) {
+    case 'ACTIVE':
+      return 'text-green-600'
+    case 'CANCELED':
+      return 'text-red-600'
+    case 'COMPLETED':
+      return 'text-blue-600'
+    default:
+      return 'text-gray-600'
+  }
+}
 
 defineEmits(['edit', 'cancel'])
 </script> 

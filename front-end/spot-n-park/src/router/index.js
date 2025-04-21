@@ -55,6 +55,38 @@ const routes = [
   },
   {
     meta: {
+      title: 'Services',
+    },
+    path: '/services',
+    name: 'services',
+    component: () => import('@/views/ServicesView.vue'),
+  },
+  {
+    meta: {
+      title: 'Schedules',
+    },
+    path: '/schedules',
+    name: 'schedules',
+    component: () => import('@/views/SchedulesView.vue'),
+  },
+  {
+    meta: {
+      title: 'Fees',
+    },
+    path: '/fees',
+    name: 'fees',
+    component: () => import('@/views/FeesView.vue'),
+  },
+  {
+    meta: {
+      title: 'Users',
+    },
+    path: '/users',
+    name: 'users',
+    component: () => import('@/views/UsersView.vue'),
+  },
+  {
+    meta: {
       title: 'Tables',
     },
     path: '/tables',

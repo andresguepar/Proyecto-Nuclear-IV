@@ -19,7 +19,6 @@ import {
   mdiCarWrench,
   mdiCalendarMonth,
   mdiAccountMultiple,
-
 } from '@mdi/js'
 
 export default [
@@ -27,6 +26,11 @@ export default [
     to: '/home',
     icon: mdiHome,
     label: 'Home',
+  },
+  {
+    to: '/slots',
+    icon: mdiCar,
+    label: 'Slots',
   },
   {
     to: '/reservations',
@@ -37,11 +41,6 @@ export default [
     to: '/dashboard',
     icon: mdiMonitor,
     label: 'Dashboard',
-  },
-  {
-    to: '/slots',
-    icon: mdiCar,
-    label: 'Slots',
   },
   {
     to: '/fees',
@@ -59,14 +58,14 @@ export default [
     label: 'Schedules',
   },
   {
-    to: '/users',
-    icon: mdiAccountMultiple,
-    label: 'Users',
-  },
-  {
     to: '/parking-lots',
     icon: mdiParking,
     label: 'Parking Lots',
+  },
+  {
+    to: '/users',
+    icon: mdiAccountMultiple,
+    label: 'Users',
   },
   {
     label: 'Dropdown',
