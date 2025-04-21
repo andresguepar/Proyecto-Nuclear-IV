@@ -23,4 +23,8 @@ public class AddOnServiceFee {
     private String addOnServices;
 
     private Boolean isActive;
+
+    @ManyToOne
+    @JoinColumn(name = "standard_reservation_id")
+    private StandardReservation standardReservation;
 } 
