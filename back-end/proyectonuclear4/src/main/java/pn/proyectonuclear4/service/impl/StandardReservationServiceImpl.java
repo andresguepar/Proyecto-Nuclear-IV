@@ -35,8 +35,6 @@ public class StandardReservationServiceImpl implements StandardReservationServic
     @Autowired
     private StatusReservationRepository statusReservationRepository;
 
-    @Autowired
-    private StandardReservationMapper standardReservationMapper;
 
     @Override
     public List<StandardReservationDto> getAllStandardReservations() {
@@ -61,10 +59,10 @@ public class StandardReservationServiceImpl implements StandardReservationServic
     public void deleteStandardReservation(int id) throws ResourceNotFoundException {
         StandardReservation standardReservation = standardReservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Standard reservation not found with id: " + id));
-        
+
         StatusReservation canceledStatus = statusReservationRepository.findByName("CANCELED")
                 .orElseThrow(() -> new ResourceNotFoundException("Status 'CANCELED' not found"));
-        
+
         standardReservation.setStatusReservation(canceledStatus);
         standardReservationRepository.save(standardReservation);
     }
@@ -98,6 +96,6 @@ public class StandardReservationServiceImpl implements StandardReservationServic
         }
 
         StandardReservation updatedReservation = standardReservationRepository.save(existingReservation);
-        return standardReservationMapper.toDto(updatedReservation);
+        return StandardReservationMapper.mapFrom(updatedReservation);
     }
 }
