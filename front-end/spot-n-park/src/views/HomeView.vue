@@ -62,21 +62,20 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
         <div class="lg:col-span-1 space-y-2">
           <CardBox
-            v-for="(lot, index) in parkingLots"
-            :key="index"
+            v-for="lot in parkingLots"
+            :key="lot.id"
             class="transform transition-all duration-200 hover:shadow-lg"
           >
             <CardBoxComponentBody class="p-2">
               <div class="flex justify-between items-start mb-1.5">
                 <div>
                   <h3 class="text-sm font-semibold text-gray-800">{{ lot.name }}</h3>
-                  <p class="text-s text-gray-800">{{ lot.distance }}</p>
+                  <p class="text-s text-gray-800">{{ lot.price }}</p>
                 </div>
                 <BaseButton
                   color="info"
                   label="Choose"
-                  medium
-                  class="text-xs px-2 py-0.5"
+                  class="text-sm px-4 py-2"
                   @click="addHours(lot)"
                 />
               </div>
@@ -96,6 +95,14 @@
                     style="color: #ff8f2b"
                   />
                   <span class="text-sm text-gray-600">{{ lot.hours }}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <BaseIcon
+                    path="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 16H6c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1h12c.55 0 1 .45 1 1v12c0 .55-.45 1-1 1z"
+                    class="w-4 h-4"
+                    style="color: #ff8f2b"
+                  />
+                  <span class="text-sm text-gray-600">{{ lot.availableSlots }} slots available</span>
                 </div>
               </div>
             </CardBoxComponentBody>
@@ -124,47 +131,110 @@ import BaseIcon from '@/components/BaseIcon.vue'
 import StandardServiceForm from '@/components/StandardServiceForm.vue'
 import MonthlyServiceForm from '@/components/MonthlyServiceForm.vue'
 import AdditionalServicesForm from '@/components/AdditionalServicesForm.vue'
+import { parkingLotsService } from '@/services/parkingLotsService'
+import { slotsService } from '@/services/slotsService'
+import { standardFeesService } from '@/services/standardFeesService'
 
 const activeTab = ref('standart')
-
-const parkingLots = ref([
-  {
-    name: 'Parking Lot 1',
-    distance: '300m',
-    address: 'Dame Gruev 12 - Zone 1 - Car',
-    hours: '08:00-12:00',
-  },
-  {
-    name: 'Parking Lot 2',
-    distance: '450m',
-    address: 'Dame Gruev 15 - Zone 2 - Car',
-    hours: '08:00-12:00',
-  },
-  {
-    name: 'Parking Lot 3',
-    distance: '600m',
-    address: 'Dame Gruev 18 - Zone 3 - Car',
-    hours: '08:00-12:00',
-  },
-])
-
+const parkingLots = ref([])
 const map = ref(null)
+const placesService = ref(null)
+const markers = ref([])
 
-const parkingLotsCoordinates = [
-  { lat: 41.9981, lng: 21.4254 }, // Example coordinates for Parking Lot 1
-  { lat: 41.9985, lng: 21.4260 }, // Example coordinates for Parking Lot 2
-  { lat: 41.9990, lng: 21.4265 }  // Example coordinates for Parking Lot 3
-]
+const fetchParkingLotsWithInfo = async () => {
+  try {
+    // Get all parking lots
+    const lots = await parkingLotsService.getAllParkingLots()
+    
+    // Get standard fees for each parking lot
+    const fees = await standardFeesService.getAllStandardFees()
+    
+    // Get available slots for each parking lot
+    const availableSlots = await slotsService.getSlotsByIsActive(true)
+    
+    // Combine the information
+    parkingLots.value = lots.map(lot => {
+      const lotFees = fees.find(fee => fee.parkingLot?.idParkingLot === lot.idParkingLot)
+      const lotSlots = availableSlots.filter(slot => slot.parkingLot?.idParkingLot === lot.idParkingLot)
+      
+      return {
+        id: lot.idParkingLot,
+        name: lot.name,
+        address: lot.address,
+        price: lotFees ? `$${lotFees.price_x_hours}/hour` : 'Price not available',
+        hours: lot.operatingHours || '24/7',
+        availableSlots: lotSlots.length,
+        latitude: lot.latitude,
+        longitude: lot.longitude
+      }
+    })
+  } catch (error) {
+    console.error('Error fetching parking lots:', error)
+  }
+}
+
+const searchNearbyParkingLots = () => {
+  if (!placesService.value || !map.value) return
+
+  // Armenia, Quindío coordinates
+  const armeniaLocation = { lat: 4.5333, lng: -75.6833 }
+  
+  // Search for parking lots within 5km radius
+  const request = {
+    location: armeniaLocation,
+    radius: 5000,
+    type: ['parking']
+  }
+
+  placesService.value.nearbySearch(request, (results, status) => {
+    if (status === google.maps.places.PlacesServiceStatus.OK) {
+      // Clear existing markers
+      markers.value.forEach(marker => marker.setMap(null))
+      markers.value = []
+
+      // Add new markers for each parking lot
+      results.forEach(place => {
+        const marker = new google.maps.Marker({
+          position: place.geometry.location,
+          map: map.value,
+          title: place.name,
+          icon: {
+            url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+          }
+        })
+
+        // Add info window
+        const infoWindow = new google.maps.InfoWindow({
+          content: `
+            <div class="p-2">
+              <h3 class="font-semibold">${place.name}</h3>
+              <p class="text-sm">${place.vicinity}</p>
+              <p class="text-sm">Rating: ${place.rating || 'N/A'}</p>
+            </div>
+          `
+        })
+
+        marker.addListener('click', () => {
+          infoWindow.open(map.value, marker)
+        })
+
+        markers.value.push(marker)
+      })
+    }
+  })
+}
 
 const addHours = (lot) => {
   console.log('Adding hours for', lot.name)
 }
 
 onMounted(async () => {
+  await fetchParkingLotsWithInfo()
+  
   try {
-    // Load Google Maps API
+    // Load Google Maps API with Places library
     const script = document.createElement('script')
-    script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=Function.prototype`
+    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCSWk47E6T5IrOjDyXA3d3pzG-DyIMVrs8&libraries=places&callback=Function.prototype`
     script.async = true
     script.defer = true
     document.head.appendChild(script)
@@ -177,18 +247,49 @@ onMounted(async () => {
     // Initialize the map
     const { Map } = await google.maps.importLibrary("maps")
     const { Marker } = await google.maps.importLibrary("marker")
+    const { PlacesService } = await google.maps.importLibrary("places")
 
     map.value = new Map(document.getElementById("map"), {
-      center: parkingLotsCoordinates[0],
-      zoom: 15,
+      center: { lat: 4.5333, lng: -75.6833 }, // Armenia, Quindío coordinates
+      zoom: 14,
     })
 
-    // Add markers for each parking lot
-    parkingLotsCoordinates.forEach(coord => {
-      new Marker({
-        position: coord,
-        map: map.value
-      })
+    // Initialize Places service
+    placesService.value = new PlacesService(map.value)
+
+    // Search for nearby parking lots
+    searchNearbyParkingLots()
+
+    // Add markers for our parking lots
+    parkingLots.value.forEach(lot => {
+      if (lot.latitude && lot.longitude) {
+        const marker = new Marker({
+          position: { lat: lot.latitude, lng: lot.longitude },
+          map: map.value,
+          title: lot.name,
+          icon: {
+            url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+          }
+        })
+
+        // Add info window
+        const infoWindow = new google.maps.InfoWindow({
+          content: `
+            <div class="p-2">
+              <h3 class="font-semibold">${lot.name}</h3>
+              <p class="text-sm">${lot.address}</p>
+              <p class="text-sm">Price: ${lot.price}</p>
+              <p class="text-sm">Available Slots: ${lot.availableSlots}</p>
+            </div>
+          `
+        })
+
+        marker.addListener('click', () => {
+          infoWindow.open(map.value, marker)
+        })
+
+        markers.value.push(marker)
+      }
     })
   } catch (error) {
     console.error('Failed to load Google Maps', error)

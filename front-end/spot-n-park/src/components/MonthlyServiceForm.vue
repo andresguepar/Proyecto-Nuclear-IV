@@ -1,73 +1,87 @@
 <script setup>
-import {ref} from 'vue'
+import {ref, onMounted} from 'vue'
 import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
+import BaseButton from '@/components/BaseButton.vue'
+import { parkingLotsService } from '@/services/parkingLotsService'
 
 const form = ref({
   parkingLot: '',
   startDate: '',
+  startTime: '',
   plate: '',
   type: 'vehicle',
   months: '1',
   paymentMethod: 'credit'
 })
 
-const monthOptions = [
-  { value: '1', label: '1 month' },
-  { value: '3', label: '3 months' },
-  { value: '6', label: '6 months' },
-  { value: '12', label: '12 months' }
-]
+const parkingLots = ref([])
 
-const paymentOptions = [
-  { value: 'credit', label: 'Credit Card' },
-  { value: 'debit', label: 'Debit Card' },
-  { value: 'bank', label: 'Bank Transfer' }
-]
+const handleSearch = () => {
+  console.log('Searching with:', form.value)
+}
+
+const fetchParkingLots = async () => {
+  try {
+    const lots = await parkingLotsService.getAllParkingLots()
+    parkingLots.value = lots.map(lot => ({
+      value: lot.id,
+      label: lot.name
+    }))
+  } catch (error) {
+    console.error('Error fetching parking lots:', error)
+  }
+}
+
+onMounted(() => {
+  fetchParkingLots()
+})
 
 defineEmits(['form-update'])
 </script>
 
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
-    <FormField label="Parking Lot" class="text-sm">
-      <FormControl
-        v-model="form.parkingLot"
-        type="text"
-        placeholder="Select parking lot"
-        class="h-7 text-sm"
-      />
-    </FormField>
-    <FormField label="Subscription start date" class="text-sm">
-      <FormControl
-        v-model="form.startDate"
-        type="date"
-        class="h-7 text-sm"
-      />
-    </FormField>
-    <FormField label="Registration plate" class="text-sm">
-      <FormControl
-        v-model="form.plate"
-        type="text"
-        placeholder="Enter plate number"
-        class="h-7 text-sm"
-      />
-    </FormField>
-    <FormField label="Subscription period" class="text-sm">
-      <FormControl
-        v-model="form.months"
-        type="select"
-        class="h-7 text-sm"
-        :options="monthOptions"
-      />
-    </FormField>
-    <FormField label="Payment method" class="text-sm">
-      <FormControl
-        v-model="form.paymentMethod"
-        type="select"
-        class="h-7 text-sm"
-        :options="paymentOptions"
-      />
-    </FormField>
+  <div class="space-y-4 flex self-center">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <FormField label="Parking Lot" class="text-sm">
+        <FormControl
+          v-model="form.parkingLot"
+          type="select"
+          placeholder="Select parking lot"
+          class="h-10 text-sm"
+          :options="parkingLots"
+        />
+      </FormField>
+      <FormField label="Date" class="text-sm">
+        <FormControl
+          v-model="form.startDate"
+          type="date"
+          class="h-10 text-sm"
+        />
+      </FormField>
+      <FormField label="Start Time" class="text-sm">
+        <FormControl
+          v-model="form.startTime"
+          type="time"
+          class="h-10 text-sm"
+        />
+      </FormField>
+      <FormField label="License Plate" class="text-sm">
+        <FormControl
+          v-model="form.plate"
+          type="text"
+          placeholder="Enter plate number"
+          class="h-10 text-sm"
+        />
+      </FormField>
+      <div class="self-center">
+        <BaseButton
+          color="info"
+          label="Search"
+          class="h-13 w-full"
+          @click="handleSearch"
+        />
+      </div>
+    </div>
   </div>
-</template> 
+</template>

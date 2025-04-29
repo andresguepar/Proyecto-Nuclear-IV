@@ -96,6 +96,7 @@
                   class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
                   required
                 >
+                  <option value="">Select a parking lot</option>
                   <option v-for="lot in parkingLots" :key="lot.id" :value="lot.id">
                     {{ lot.name }}
                   </option>
@@ -108,6 +109,7 @@
                   class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
                   required
                 >
+                  <option value="">Select a day</option>
                   <option v-for="day in weekDays" :key="day.id" :value="day.id">
                     {{ day.name }}
                   </option>
@@ -223,6 +225,7 @@
                   class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
                   required
                 >
+                  <option value="">Select a parking lot</option>
                   <option v-for="lot in parkingLots" :key="lot.id" :value="lot.id">
                     {{ lot.name }}
                   </option>
@@ -285,32 +288,31 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { mdiCalendar, mdiPencil, mdiClose } from '@mdi/js'
-import { schedulesService } from '@/services/schedulesService'
-import { parkingLotsService } from '@/services/parkingLotsService'
-import { weekDaysService } from '@/services/weekDaysService'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionMain from '@/components/SectionMain.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import CardBox from '@/components/CardBox.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
-
-const tabs = [
-  { id: 'schedule', label: 'Regular Schedules' },
-  { id: 'daily', label: 'Daily Schedules' }
-]
+import { parkingLotsService } from '@/services/parkingLotsService'
+import { weekDaysService } from '@/services/weekDaysService'
+import { schedulesService } from '@/services/schedulesService'
 
 const activeTab = ref('schedule')
+const isEditing = ref(false)
+const errorMessage = ref('')
+const successMessage = ref('')
 const schedules = ref([])
 const dailySchedules = ref([])
 const parkingLots = ref([])
 const weekDays = ref([])
-const isEditing = ref(false)
-const errorMessage = ref('')
-const successMessage = ref('')
+
+const tabs = [
+  { id: 'schedule', label: 'Schedule' },
+  { id: 'daily', label: 'Daily Schedule' }
+]
 
 const scheduleForm = ref({
-  id: null,
   id_parking_lot: '',
   id_week_day: '',
   open_time: '',
@@ -319,7 +321,6 @@ const scheduleForm = ref({
 })
 
 const dailyScheduleForm = ref({
-  id: null,
   id_parking_lot: '',
   date: '',
   open_time: '',
@@ -327,57 +328,53 @@ const dailyScheduleForm = ref({
   status: 'active'
 })
 
-const showError = (message) => {
-  errorMessage.value = message
-  setTimeout(() => {
-    errorMessage.value = ''
-  }, 5000)
-}
+const fetchData = async () => {
+  try {
+    // Fetch parking lots
+    const lots = await parkingLotsService.getAllParkingLots()
+    parkingLots.value = lots.map(lot => ({
+      id: lot.idParkingLot,
+      name: lot.name
+    }))
 
-const showSuccess = (message) => {
-  successMessage.value = message
-  setTimeout(() => {
-    successMessage.value = ''
-  }, 5000)
+    // Fetch week days
+    try {
+      const days = await weekDaysService.getAllWeekDays()
+      console.log('Week days from service:', days) // Debug log
+      if (Array.isArray(days) && days.length > 0) {
+        weekDays.value = days.map(day => ({
+          id: day.idWeekDay,
+          name: day.name
+        }))
+        console.log('Mapped week days:', weekDays.value) // Debug log
+      } else {
+        console.warn('No week days found or invalid data format')
+        weekDays.value = []
+      }
+    } catch (weekDaysError) {
+      console.error('Error fetching week days:', weekDaysError)
+      errorMessage.value = 'Error loading week days. Please try again.'
+      weekDays.value = []
+    }
+
+    // Fetch schedules
+    const scheduleData = await schedulesService.getAllSchedules()
+    schedules.value = scheduleData
+
+    // Fetch daily schedules
+    const dailyData = await schedulesService.getAllDailySchedules()
+    dailySchedules.value = dailyData
+  } catch (error) {
+    console.error('Error fetching data:', error)
+    errorMessage.value = 'Error loading data. Please try again.'
+  }
 }
 
 const getStatusClass = (status) => {
-  return status === 'active' ? 'text-green-500' : 'text-red-500'
-}
-
-const fetchSchedules = async () => {
-  try {
-    schedules.value = await schedulesService.getAllSchedules()
-  } catch (error) {
-    console.error('Error fetching schedules:', error)
-    showError('Error al cargar los horarios. Por favor, intente nuevamente.')
-  }
-}
-
-const fetchDailySchedules = async () => {
-  try {
-    dailySchedules.value = await schedulesService.getAllDailySchedules()
-  } catch (error) {
-    console.error('Error fetching daily schedules:', error)
-    showError('Error al cargar los horarios diarios. Por favor, intente nuevamente.')
-  }
-}
-
-const fetchParkingLots = async () => {
-  try {
-    parkingLots.value = await parkingLotsService.getAllParkingLots()
-  } catch (error) {
-    console.error('Error fetching parking lots:', error)
-    showError('Error al cargar los estacionamientos. Por favor, intente nuevamente.')
-  }
-}
-
-const fetchWeekDays = async () => {
-  try {
-    weekDays.value = await weekDaysService.getAllWeekDays()
-  } catch (error) {
-    console.error('Error fetching week days:', error)
-    showError('Error al cargar los días de la semana. Por favor, intente nuevamente.')
+  return {
+    'px-2 py-1 rounded text-xs font-semibold': true,
+    'bg-green-100 text-green-800': status === 'active',
+    'bg-red-100 text-red-800': status === 'inactive'
   }
 }
 
@@ -385,16 +382,16 @@ const handleScheduleSubmit = async () => {
   try {
     if (isEditing.value) {
       await schedulesService.updateSchedule(scheduleForm.value.id, scheduleForm.value)
-      showSuccess('Horario actualizado exitosamente')
+      successMessage.value = 'Schedule updated successfully'
     } else {
       await schedulesService.createSchedule(scheduleForm.value)
-      showSuccess('Horario creado exitosamente')
+      successMessage.value = 'Schedule created successfully'
     }
-    resetScheduleForm()
-    await fetchSchedules()
+    await fetchData()
+    resetForm()
   } catch (error) {
     console.error('Error saving schedule:', error)
-    showError('Error al guardar el horario. Por favor, intente nuevamente.')
+    errorMessage.value = 'Error saving schedule. Please try again.'
   }
 }
 
@@ -402,92 +399,88 @@ const handleDailyScheduleSubmit = async () => {
   try {
     if (isEditing.value) {
       await schedulesService.updateDailySchedule(dailyScheduleForm.value.id, dailyScheduleForm.value)
-      showSuccess('Horario diario actualizado exitosamente')
+      successMessage.value = 'Daily schedule updated successfully'
     } else {
       await schedulesService.createDailySchedule(dailyScheduleForm.value)
-      showSuccess('Horario diario creado exitosamente')
+      successMessage.value = 'Daily schedule created successfully'
     }
-    resetDailyScheduleForm()
-    await fetchDailySchedules()
+    await fetchData()
+    resetForm()
   } catch (error) {
     console.error('Error saving daily schedule:', error)
-    showError('Error al guardar el horario diario. Por favor, intente nuevamente.')
+    errorMessage.value = 'Error saving daily schedule. Please try again.'
   }
 }
 
 const editSchedule = (schedule) => {
   isEditing.value = true
-  scheduleForm.value = { ...schedule }
+  scheduleForm.value = {
+    id: schedule.id,
+    id_parking_lot: schedule.id_parking_lot,
+    id_week_day: schedule.id_week_day,
+    open_time: schedule.open_time,
+    close_time: schedule.close_time,
+    status: schedule.status
+  }
 }
 
 const editDailySchedule = (schedule) => {
   isEditing.value = true
-  dailyScheduleForm.value = { ...schedule }
+  dailyScheduleForm.value = {
+    id: schedule.id,
+    id_parking_lot: schedule.id_parking_lot,
+    date: schedule.date,
+    open_time: schedule.open_time,
+    close_time: schedule.close_time,
+    status: schedule.status
+  }
 }
 
 const deleteSchedule = async (id) => {
-  if (!confirm('¿Está seguro de que desea eliminar este horario?')) {
-    return
-  }
-  try {
-    await schedulesService.deleteSchedule(id)
-    showSuccess('Horario eliminado exitosamente')
-    await fetchSchedules()
-  } catch (error) {
-    console.error('Error deleting schedule:', error)
-    showError('Error al eliminar el horario. Por favor, intente nuevamente.')
+  if (confirm('Are you sure you want to delete this schedule?')) {
+    try {
+      await schedulesService.deleteSchedule(id)
+      successMessage.value = 'Schedule deleted successfully'
+      await fetchData()
+    } catch (error) {
+      console.error('Error deleting schedule:', error)
+      errorMessage.value = 'Error deleting schedule. Please try again.'
+    }
   }
 }
 
 const deleteDailySchedule = async (id) => {
-  if (!confirm('¿Está seguro de que desea eliminar este horario diario?')) {
-    return
-  }
-  try {
-    await schedulesService.deleteDailySchedule(id)
-    showSuccess('Horario diario eliminado exitosamente')
-    await fetchDailySchedules()
-  } catch (error) {
-    console.error('Error deleting daily schedule:', error)
-    showError('Error al eliminar el horario diario. Por favor, intente nuevamente.')
+  if (confirm('Are you sure you want to delete this daily schedule?')) {
+    try {
+      await schedulesService.deleteDailySchedule(id)
+      successMessage.value = 'Daily schedule deleted successfully'
+      await fetchData()
+    } catch (error) {
+      console.error('Error deleting daily schedule:', error)
+      errorMessage.value = 'Error deleting daily schedule. Please try again.'
+    }
   }
 }
 
-const resetScheduleForm = () => {
+const resetForm = () => {
+  isEditing.value = false
   scheduleForm.value = {
-    id: null,
     id_parking_lot: '',
     id_week_day: '',
     open_time: '',
     close_time: '',
     status: 'active'
   }
-  isEditing.value = false
-}
-
-const resetDailyScheduleForm = () => {
   dailyScheduleForm.value = {
-    id: null,
     id_parking_lot: '',
     date: '',
     open_time: '',
     close_time: '',
     status: 'active'
   }
-  isEditing.value = false
 }
 
-onMounted(async () => {
-  try {
-    await Promise.all([
-      fetchSchedules(),
-      fetchDailySchedules(),
-      fetchParkingLots(),
-      fetchWeekDays()
-    ])
-  } catch (error) {
-    console.error('Error initializing component:', error)
-    showError('Error al cargar los datos. Por favor, intente nuevamente.')
-  }
+onMounted(() => {
+  fetchData()
 })
 </script> 
