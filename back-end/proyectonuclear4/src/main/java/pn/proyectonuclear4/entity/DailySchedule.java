@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Data
@@ -24,9 +23,9 @@ public class DailySchedule {
     @JoinColumn(name = "id_schedule")
     private Schedule schedule;
 
-    private LocalDateTime startTime;
+    private LocalTime startTime;
 
-    private LocalDateTime endTime;
+    private LocalTime endTime;
 
     @ManyToOne
     @JoinColumn(name = "id_week_day")

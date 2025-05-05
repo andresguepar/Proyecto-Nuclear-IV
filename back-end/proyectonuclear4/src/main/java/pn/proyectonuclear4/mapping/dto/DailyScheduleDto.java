@@ -4,14 +4,14 @@ import lombok.Builder;
 import pn.proyectonuclear4.entity.Schedule;
 import pn.proyectonuclear4.entity.WeekDay;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Builder
 public record DailyScheduleDto(
         int idDailySchedule,
         Schedule schedule,
-        LocalDateTime startTime,
-        LocalDateTime endTime,
+        LocalTime startTime,
+        LocalTime endTime,
         WeekDay weekDay,
         Boolean isActive
 ) {

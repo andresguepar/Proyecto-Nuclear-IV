@@ -10,6 +10,7 @@ import {
   mdiMenu,
   mdiReact,
   mdiThemeLightDark,
+  mdiViewDashboard,
 } from '@mdi/js'
 
 export default [
@@ -86,4 +87,19 @@ export default [
     isDesktopNoLabel: true,
     isLogout: true,
   },
+  {
+    label: 'Menu',
+    menu: [
+      {
+        label: 'Dashboard',
+        icon: mdiViewDashboard,
+        to: '/'
+      },
+      {
+        label: 'Profile',
+        icon: mdiAccount,
+        to: '/profile'
+      }
+    ]
+  }
 ]

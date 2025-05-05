@@ -19,11 +19,13 @@ import {
   mdiCarWrench,
   mdiCalendarMonth,
   mdiAccountMultiple,
+  mdiViewDashboard,
+  mdiAccount,
 } from '@mdi/js'
 
 export default [
   {
-    to: '/home',
+    to: '/',
     icon: mdiHome,
     label: 'Home',
   },
@@ -111,7 +113,7 @@ export default [
       {
         to: '/profile',
         label: 'Profile',
-        icon: mdiAccountCircle,
+        icon: mdiAccount,
       },
       {
         to: '/login',
@@ -136,5 +138,20 @@ export default [
         target: '_blank',
       },
     ],
+  },
+  {
+    label: 'Menu',
+    menu: [
+      {
+        label: 'Dashboard',
+        icon: mdiViewDashboard,
+        to: '/'
+      },
+      {
+        label: 'Profile',
+        icon: mdiAccount,
+        to: '/profile'
+      }
+    ]
   }
 ]

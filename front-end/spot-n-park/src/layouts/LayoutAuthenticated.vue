@@ -74,11 +74,13 @@ const menuClick = (event, item) => {
       />
       <slot />
       <FooterBar>
-<!--        Get more with
-        <a href="https://tailwind-vue.justboil.me/" target="_blank" class="text-blue-600"
-          >Premium version</a
-        >
--->
+        <footer class="py-2 px-6 mx-auto">
+          <div class="text-center">
+            <p class="text-sm text-gray-500">
+              &copy; {{ new Date().getFullYear() }} Spot N Park. All rights reserved.
+            </p>
+          </div>
+        </footer>
       </FooterBar>
     </div>
   </div>

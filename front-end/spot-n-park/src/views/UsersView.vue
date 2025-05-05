@@ -11,13 +11,12 @@
               <th>Username</th>
               <th>Email</th>
               <th>Role</th>
-              <th>Status</th>
               <th />
             </tr>
           </thead>
           <tbody>
             <tr v-if="users.length === 0">
-              <td colspan="6" class="text-center py-24 text-gray-500 dark:text-slate-400">
+              <td colspan="5" class="text-center py-24 text-gray-500 dark:text-slate-400">
                 <p>No users found</p>
               </td>
             </tr>
@@ -26,11 +25,6 @@
               <td data-label="Username">{{ user.username }}</td>
               <td data-label="Email">{{ user.email }}</td>
               <td data-label="Role">{{ user.role?.name || 'N/A' }}</td>
-              <td data-label="Status">
-                <span :class="getStatusClass(user.isActive)">
-                  {{ user.isActive ? 'Active' : 'Inactive' }}
-                </span>
-              </td>
               <td class="before:hidden lg:w-1 whitespace-nowrap">
                 <BaseButtons type="justify-start lg:justify-end" no-wrap>
                   <BaseButton
@@ -43,7 +37,7 @@
                     color="danger"
                     :icon="mdiClose"
                     small
-                    @click="deleteUser(user.idUser)"
+                    @click="deactivateUser(user.idUser)"
                   />
                 </BaseButtons>
               </td>
@@ -76,18 +70,21 @@ const editUser = (user) => {
   console.log('Edit user:', user)
 }
 
-const deleteUser = async (id) => {
-  try {
-    await usersService.deleteUser(id)
-    await fetchUsers()
-  } catch (error) {
-    console.error('Error deleting user:', error)
+const deactivateUser = async (id) => {
+  if (confirm('Are you sure you want to deactivate this user?')) {
+    try {
+      await usersService.updateUser(id, { isActive: false })
+      await fetchUsers()
+    } catch (error) {
+      console.error('Error deactivating user:', error)
+    }
   }
 }
 
 const fetchUsers = async () => {
   try {
-    users.value = await usersService.getActiveUsers()
+    const allUsers = await usersService.getAllUsers()
+    users.value = allUsers.filter(user => user.isActive)
   } catch (error) {
     console.error('Error fetching users:', error)
     users.value = []

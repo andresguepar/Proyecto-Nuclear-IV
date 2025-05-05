@@ -40,6 +40,15 @@ public class DailyScheduleServiceImpl implements DailyScheduleService {
     @Override
     public DailyScheduleDto saveDailySchedule(DailyScheduleDto dailyScheduleDto) {
         DailySchedule dailySchedule = DailyScheduleMapper.mapFrom(dailyScheduleDto);
+        
+        // Asegurarse de que los tiempos estén en formato LocalTime
+        if (dailyScheduleDto.startTime() != null) {
+            dailySchedule.setStartTime(dailyScheduleDto.startTime());
+        }
+        if (dailyScheduleDto.endTime() != null) {
+            dailySchedule.setEndTime(dailyScheduleDto.endTime());
+        }
+        
         DailySchedule savedDailySchedule = dailyScheduleRepository.save(dailySchedule);
         return DailyScheduleMapper.mapFrom(savedDailySchedule);
     }

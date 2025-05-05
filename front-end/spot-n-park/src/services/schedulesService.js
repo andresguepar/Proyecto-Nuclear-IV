@@ -16,9 +16,7 @@ export const schedulesService = {
   // Regular Schedules
   async getAllSchedules() {
     try {
-      console.log('Obteniendo todos los horarios...')
       const response = await axios.get(`${API_URL}/get`)
-      console.log('Respuesta de horarios:', response.data)
       return response.data
     } catch (error) {
       console.error('Error al obtener horarios:', error)
@@ -28,7 +26,6 @@ export const schedulesService = {
 
   async getScheduleById(id) {
     try {
-      console.log(`Obteniendo horario con ID: ${id}`)
       const response = await axios.get(`${API_URL}/get/${id}`)
       return response.data
     } catch (error) {
@@ -39,20 +36,17 @@ export const schedulesService = {
 
   async createSchedule(scheduleData) {
     try {
-      console.log('Creando nuevo horario:', scheduleData)
       const transformedData = {
         idSchedule: scheduleData.id || null,
         startTime: scheduleData.open_time,
         endTime: scheduleData.close_time,
         dayOfWeek: scheduleData.id_week_day,
-        status: scheduleData.status,
+        status: scheduleData.status === 'true',
         parkingLot: {
           idParkingLot: scheduleData.id_parking_lot
         }
       }
-      console.log('Datos transformados:', transformedData)
       const response = await axios.post(`${API_URL}/save`, transformedData)
-      console.log('Respuesta de creación:', response.data)
       return response.data
     } catch (error) {
       console.error('Error al crear horario:', error)
@@ -62,20 +56,17 @@ export const schedulesService = {
 
   async updateSchedule(id, scheduleData) {
     try {
-      console.log(`Actualizando horario ${id}:`, scheduleData)
       const transformedData = {
         idSchedule: id,
         startTime: scheduleData.open_time,
         endTime: scheduleData.close_time,
         dayOfWeek: scheduleData.id_week_day,
-        status: scheduleData.status,
+        status: scheduleData.status === 'true',
         parkingLot: {
           idParkingLot: scheduleData.id_parking_lot
         }
       }
-      console.log('Datos transformados:', transformedData)
       const response = await axios.post(`${API_URL}/save`, transformedData)
-      console.log('Respuesta de actualización:', response.data)
       return response.data
     } catch (error) {
       console.error(`Error al actualizar horario ${id}:`, error)
@@ -85,9 +76,7 @@ export const schedulesService = {
 
   async deleteSchedule(id) {
     try {
-      console.log(`Eliminando horario ${id}`)
       const response = await axios.delete(`${API_URL}/delete/${id}`)
-      console.log('Respuesta de eliminación:', response.data)
       return response.data
     } catch (error) {
       console.error(`Error al eliminar horario ${id}:`, error)
@@ -97,7 +86,6 @@ export const schedulesService = {
 
   async getSchedulesByIsActive(isActive) {
     try {
-      console.log(`Obteniendo horarios por estado activo: ${isActive}`)
       const response = await axios.get(`${API_URL}/filterByIsActive/${isActive}`)
       return response.data
     } catch (error) {
@@ -108,7 +96,6 @@ export const schedulesService = {
 
   async getSchedulesByParkingLot(parkingLotId) {
     try {
-      console.log(`Obteniendo horarios por parking lot: ${parkingLotId}`)
       const response = await axios.get(`${API_URL}/filterByParkingLot/${parkingLotId}`)
       return response.data
     } catch (error) {
@@ -143,20 +130,22 @@ export const schedulesService = {
 
   async createDailySchedule(scheduleData) {
     try {
-      console.log('Creando nuevo horario diario:', scheduleData)
       const transformedData = {
         idDailySchedule: scheduleData.id || null,
-        date: scheduleData.date,
+        schedule: {
+          idSchedule: scheduleData.id_schedule,
+          parkingLot: {
+            idParkingLot: scheduleData.id_parking_lot
+          }
+        },
         startTime: scheduleData.open_time,
         endTime: scheduleData.close_time,
         status: scheduleData.status,
-        parkingLot: {
-          idParkingLot: scheduleData.id_parking_lot
+        weekDay: {
+          idWeekDay: scheduleData.id_week_day
         }
       }
-      console.log('Datos transformados:', transformedData)
       const response = await axios.post(`${DAILY_API_URL}/save`, transformedData)
-      console.log('Respuesta de creación:', response.data)
       return response.data
     } catch (error) {
       console.error('Error al crear horario diario:', error)
@@ -220,4 +209,4 @@ export const schedulesService = {
       throw error
     }
   }
-} 
+}

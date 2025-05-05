@@ -29,13 +29,12 @@
                     <th>Vehicle Type</th>
                     <th>Price per Hour</th>
                     <th>12 Hours Price</th>
-                    <th>Status</th>
                     <th />
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-if="standardFees.length === 0">
-                    <td colspan="7" class="text-center py-24 text-gray-500 dark:text-slate-400">
+                    <td colspan="6" class="text-center py-24 text-gray-500 dark:text-slate-400">
                       <p>No standard fees found</p>
                     </td>
                   </tr>
@@ -45,11 +44,6 @@
                     <td data-label="Vehicle Type">{{ fee.vehicle_type_name }}</td>
                     <td data-label="Price per Hour">${{ fee.price_x_hours }}</td>
                     <td data-label="12 Hours Price">${{ fee.price_x_12_hours }}</td>
-                    <td data-label="Status">
-                      <span :class="getStatusClass(fee.status)">
-                        {{ fee.status }}
-                      </span>
-                    </td>
                     <td class="before:hidden lg:w-1 whitespace-nowrap">
                       <BaseButtons type="justify-start lg:justify-end" no-wrap>
                         <BaseButton
@@ -62,7 +56,7 @@
                           color="danger"
                           :icon="mdiClose"
                           small
-                          @click="deleteStandardFee(fee.id)"
+                          @click="deactivateStandardFee(fee.id)"
                         />
                       </BaseButtons>
                     </td>
@@ -82,13 +76,12 @@
                     <th>Parking Lot</th>
                     <th>Vehicle Type</th>
                     <th>Price</th>
-                    <th>Status</th>
                     <th />
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-if="monthlyFees.length === 0">
-                    <td colspan="6" class="text-center py-24 text-gray-500 dark:text-slate-400">
+                    <td colspan="5" class="text-center py-24 text-gray-500 dark:text-slate-400">
                       <p>No monthly fees found</p>
                     </td>
                   </tr>
@@ -97,11 +90,6 @@
                     <td data-label="Parking Lot">{{ fee.parking_lot_name }}</td>
                     <td data-label="Vehicle Type">{{ fee.vehicle_type_name }}</td>
                     <td data-label="Price">${{ fee.price }}</td>
-                    <td data-label="Status">
-                      <span :class="getStatusClass(fee.status)">
-                        {{ fee.status }}
-                      </span>
-                    </td>
                     <td class="before:hidden lg:w-1 whitespace-nowrap">
                       <BaseButtons type="justify-start lg:justify-end" no-wrap>
                         <BaseButton
@@ -114,7 +102,7 @@
                           color="danger"
                           :icon="mdiClose"
                           small
-                          @click="deleteMonthlyFee(fee.id)"
+                          @click="deactivateMonthlyFee(fee.id)"
                         />
                       </BaseButtons>
                     </td>
@@ -136,13 +124,12 @@
                     <th>Service</th>
                     <th>Add-on Services</th>
                     <th>Price</th>
-                    <th>Status</th>
                     <th />
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-if="serviceFees.length === 0">
-                    <td colspan="8" class="text-center py-24 text-gray-500 dark:text-slate-400">
+                    <td colspan="7" class="text-center py-24 text-gray-500 dark:text-slate-400">
                       <p>No service fees found</p>
                     </td>
                   </tr>
@@ -166,11 +153,6 @@
                       </div>
                     </td>
                     <td data-label="Price">${{ fee.price }}</td>
-                    <td data-label="Status">
-                      <span :class="getStatusClass(fee.status)">
-                        {{ fee.status }}
-                      </span>
-                    </td>
                     <td class="before:hidden lg:w-1 whitespace-nowrap">
                       <BaseButtons type="justify-start lg:justify-end" no-wrap>
                         <BaseButton
@@ -183,7 +165,7 @@
                           color="danger"
                           :icon="mdiClose"
                           small
-                          @click="deleteServiceFee(fee.id)"
+                          @click="deactivateServiceFee(fee.id)"
                         />
                       </BaseButtons>
                     </td>
@@ -373,13 +355,13 @@ const editStandardFee = (fee) => {
   form.value = { ...fee }
 }
 
-const deleteStandardFee = async (id) => {
-  if (confirm('Are you sure you want to delete this fee?')) {
+const deactivateStandardFee = async (id) => {
+  if (confirm('Are you sure you want to deactivate this fee?')) {
     try {
-      await standardFeesService.deleteStandardFee(id)
+      await standardFeesService.updateStandardFee(id, { status: 'inactive' })
       await loadStandardFees()
     } catch (error) {
-      console.error('Error deleting standard fee:', error)
+      console.error('Error deactivating standard fee:', error)
     }
   }
 }
@@ -389,13 +371,13 @@ const editMonthlyFee = (fee) => {
   form.value = { ...fee }
 }
 
-const deleteMonthlyFee = async (id) => {
-  if (confirm('Are you sure you want to delete this fee?')) {
+const deactivateMonthlyFee = async (id) => {
+  if (confirm('Are you sure you want to deactivate this fee?')) {
     try {
-      await monthlyFeesService.deleteMonthlyFee(id)
+      await monthlyFeesService.updateMonthlyFee(id, { status: 'inactive' })
       await loadMonthlyFees()
     } catch (error) {
-      console.error('Error deleting monthly fee:', error)
+      console.error('Error deactivating monthly fee:', error)
     }
   }
 }
@@ -405,13 +387,13 @@ const editServiceFee = (fee) => {
   form.value = { ...fee }
 }
 
-const deleteServiceFee = async (id) => {
-  if (confirm('Are you sure you want to delete this fee?')) {
+const deactivateServiceFee = async (id) => {
+  if (confirm('Are you sure you want to deactivate this fee?')) {
     try {
-      await serviceFeesService.deleteServiceFee(id)
+      await serviceFeesService.updateServiceFee(id, { status: 'inactive' })
       await loadServiceFees()
     } catch (error) {
-      console.error('Error deleting service fee:', error)
+      console.error('Error deactivating service fee:', error)
     }
   }
 }
@@ -419,7 +401,7 @@ const deleteServiceFee = async (id) => {
 const loadStandardFees = async () => {
   try {
     const fees = await standardFeesService.getAllStandardFees()
-    standardFees.value = fees
+    standardFees.value = fees.filter(fee => fee.status === 'active')
   } catch (error) {
     console.error('Error loading standard fees:', error)
   }
@@ -428,7 +410,7 @@ const loadStandardFees = async () => {
 const loadMonthlyFees = async () => {
   try {
     const fees = await monthlyFeesService.getAllMonthlyFees()
-    monthlyFees.value = fees
+    monthlyFees.value = fees.filter(fee => fee.status === 'active')
   } catch (error) {
     console.error('Error loading monthly fees:', error)
   }
@@ -437,7 +419,7 @@ const loadMonthlyFees = async () => {
 const loadServiceFees = async () => {
   try {
     const fees = await serviceFeesService.getAllServiceFees()
-    serviceFees.value = fees
+    serviceFees.value = fees.filter(fee => fee.status === 'active')
   } catch (error) {
     console.error('Error loading service fees:', error)
   }

@@ -107,7 +107,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { mdiPencil, mdiClose } from '@mdi/js'
-import BaseIcon from '@/components/BaseIcon.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import CardBox from '@/components/CardBox.vue'
@@ -213,4 +212,4 @@ onMounted(async () => {
     fetchVehicleTypes()
   ])
 })
-</script> 
+</script>

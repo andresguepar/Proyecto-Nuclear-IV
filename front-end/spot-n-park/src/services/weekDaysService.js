@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_URL = 'http://localhost:8080/weekdays'
+const API_URL = 'http://localhost:8080/week-days'
 
 export const weekDaysService = {
   async getAllWeekDays() {
