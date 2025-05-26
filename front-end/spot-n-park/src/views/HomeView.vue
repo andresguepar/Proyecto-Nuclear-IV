@@ -8,7 +8,7 @@
         <span style="color: #e1ebf5;">Book </span>
         <span style="color: #2e76ae;">your spot, </span>
         <span style="color: #0e2338;">park without </span>
-        <span style="color: #ff8f2b;">spot</span>
+        <span style="color: #ff8f2b;">stop</span>
       </div>
 
       <!-- Tabs with Card -->
@@ -121,6 +121,7 @@
 </template>
 
 <script setup>
+/* global google */
 import { ref, onMounted } from 'vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionMain from '@/components/SectionMain.vue'
@@ -138,25 +139,69 @@ import { standardFeesService } from '@/services/standardFeesService'
 const activeTab = ref('standart')
 const parkingLots = ref([])
 const map = ref(null)
-const placesService = ref(null)
 const markers = ref([])
+const parkingLotsData = ref([])
+
+// Make initMap available globally
+window.initMap = function() {
+  map.value = new google.maps.Map(document.getElementById("map"), {
+    center: { lat: 4.5333, lng: -75.6833 }, // Armenia, Quindío coordinates
+    zoom: 14,
+  })
+
+  // Clear existing markers if any
+  markers.value.forEach(marker => marker.setMap(null))
+  markers.value = []
+
+  // Add markers for our parking lots with available slots
+  parkingLotsData.value.filter(lot => lot.availableSlots > 0).forEach(lot => {
+    if (lot.latitude && lot.longitude) {
+      const marker = new google.maps.Marker({
+        position: { lat: lot.latitude, lng: lot.longitude },
+        map: map.value,
+        title: lot.name,
+        icon: {
+          url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+        }
+      })
+
+      // Add info window
+      const infoWindow = new google.maps.InfoWindow({
+        content: `
+          <div class="p-2">
+            <h3 class="font-semibold">${lot.name}</h3>
+            <p class="text-sm">${lot.address}</p>
+            <p class="text-sm">Price: ${lot.price}</p>
+            <p class="text-sm">Available Slots: ${lot.availableSlots}</p>
+          </div>
+        `
+      })
+
+      marker.addListener('click', () => {
+        infoWindow.open(map.value, marker)
+      })
+
+      markers.value.push(marker)
+    }
+  })
+}
 
 const fetchParkingLotsWithInfo = async () => {
   try {
     // Get all parking lots
     const lots = await parkingLotsService.getAllParkingLots()
-    
+
     // Get standard fees for each parking lot
     const fees = await standardFeesService.getAllStandardFees()
-    
+
     // Get available slots for each parking lot
     const availableSlots = await slotsService.getSlotsByIsActive(true)
-    
+
     // Combine the information
-    parkingLots.value = lots.map(lot => {
+    parkingLotsData.value = lots.map(lot => {
       const lotFees = fees.find(fee => fee.parkingLot?.idParkingLot === lot.idParkingLot)
       const lotSlots = availableSlots.filter(slot => slot.parkingLot?.idParkingLot === lot.idParkingLot)
-      
+
       return {
         id: lot.idParkingLot,
         name: lot.name,
@@ -168,60 +213,12 @@ const fetchParkingLotsWithInfo = async () => {
         longitude: lot.longitude
       }
     })
+
+    // Update the parkingLots ref with the same data
+    parkingLots.value = parkingLotsData.value
   } catch (error) {
     console.error('Error fetching parking lots:', error)
   }
-}
-
-const searchNearbyParkingLots = () => {
-  if (!placesService.value || !map.value) return
-
-  // Armenia, Quindío coordinates
-  const armeniaLocation = { lat: 4.5333, lng: -75.6833 }
-  
-  // Search for parking lots within 5km radius
-  const request = {
-    location: armeniaLocation,
-    radius: 5000,
-    type: ['parking']
-  }
-
-  placesService.value.nearbySearch(request, (results, status) => {
-    if (status === google.maps.places.PlacesServiceStatus.OK) {
-      // Clear existing markers
-      markers.value.forEach(marker => marker.setMap(null))
-      markers.value = []
-
-      // Add new markers for each parking lot
-      results.forEach(place => {
-        const marker = new google.maps.Marker({
-          position: place.geometry.location,
-          map: map.value,
-          title: place.name,
-          icon: {
-            url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-          }
-        })
-
-        // Add info window
-        const infoWindow = new google.maps.InfoWindow({
-          content: `
-            <div class="p-2">
-              <h3 class="font-semibold">${place.name}</h3>
-              <p class="text-sm">${place.vicinity}</p>
-              <p class="text-sm">Rating: ${place.rating || 'N/A'}</p>
-            </div>
-          `
-        })
-
-        marker.addListener('click', () => {
-          infoWindow.open(map.value, marker)
-        })
-
-        markers.value.push(marker)
-      })
-    }
-  })
 }
 
 const addHours = (lot) => {
@@ -230,70 +227,13 @@ const addHours = (lot) => {
 
 onMounted(async () => {
   await fetchParkingLotsWithInfo()
-  
-  try {
-    // Load Google Maps API with Places library
-    const script = document.createElement('script')
-    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCSWk47E6T5IrOjDyXA3d3pzG-DyIMVrs8&libraries=places&callback=Function.prototype`
-    script.async = true
-    script.defer = true
-    document.head.appendChild(script)
 
-    // Wait for the script to load
-    await new Promise((resolve) => {
-      script.onload = resolve
-    })
-
-    // Initialize the map
-    const { Map } = await google.maps.importLibrary("maps")
-    const { Marker } = await google.maps.importLibrary("marker")
-    const { PlacesService } = await google.maps.importLibrary("places")
-
-    map.value = new Map(document.getElementById("map"), {
-      center: { lat: 4.5333, lng: -75.6833 }, // Armenia, Quindío coordinates
-      zoom: 14,
-    })
-
-    // Initialize Places service
-    placesService.value = new PlacesService(map.value)
-
-    // Search for nearby parking lots
-    searchNearbyParkingLots()
-
-    // Add markers for our parking lots
-    parkingLots.value.forEach(lot => {
-      if (lot.latitude && lot.longitude) {
-        const marker = new Marker({
-          position: { lat: lot.latitude, lng: lot.longitude },
-          map: map.value,
-          title: lot.name,
-          icon: {
-            url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
-          }
-        })
-
-        // Add info window
-        const infoWindow = new google.maps.InfoWindow({
-          content: `
-            <div class="p-2">
-              <h3 class="font-semibold">${lot.name}</h3>
-              <p class="text-sm">${lot.address}</p>
-              <p class="text-sm">Price: ${lot.price}</p>
-              <p class="text-sm">Available Slots: ${lot.availableSlots}</p>
-            </div>
-          `
-        })
-
-        marker.addListener('click', () => {
-          infoWindow.open(map.value, marker)
-        })
-
-        markers.value.push(marker)
-      }
-    })
-  } catch (error) {
-    console.error('Failed to load Google Maps', error)
-  }
+  // Load Google Maps API with callback to initMap
+  const script = document.createElement('script')
+  script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCSWk47E6T5IrOjDyXA3d3pzG-DyIMVrs8&callback=initMap`
+  script.async = true
+  script.defer = true
+  document.head.appendChild(script)
 })
 </script>
 
