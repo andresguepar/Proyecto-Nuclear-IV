@@ -134,6 +134,22 @@ const routes = [
     name: 'error',
     component: () => import('@/views/ErrorView.vue'),
   },
+  {
+    meta: {
+      title: 'Recuperar contraseña',
+    },
+    path: '/forgot-password',
+    name: 'forgot-password',
+    component: () => import('@/views/ForgotPasswordView.vue'),
+  },
+  {
+    meta: {
+      title: 'Registro de usuario',
+    },
+    path: '/register',
+    name: 'register',
+    component: () => import('@/views/RegisterView.vue'),
+  },
 ]
 
 const router = createRouter({
