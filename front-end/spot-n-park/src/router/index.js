@@ -1,5 +1,4 @@
 import {createRouter, createWebHashHistory} from 'vue-router'
-import Style from '@/views/StyleView.vue'
 import Home from '@/views/HomeView.vue'
 
 const routes = [
@@ -53,7 +52,7 @@ const routes = [
     name: 'parking-lots',
     component: () => import('@/views/ParkingLotsView.vue'),
   },
-  
+
   {
     meta: {
       title: 'Schedules',

@@ -2,7 +2,7 @@
   <LayoutAuthenticated>
     <SectionMain>
       <SectionTitleLineWithButton :icon="mdiCashMultiple" title="Fees" main />
-      
+
       <div class="mb-6">
         <BaseButtons>
           <BaseButton
@@ -121,51 +121,45 @@
                     <th>ID</th>
                     <th>Parking Lot</th>
                     <th>Vehicle Type</th>
-                    <th>Service</th>
-                    <th>Add-on Services</th>
+                    <th>Name</th>
+                    <th>Description</th>
                     <th>Price</th>
+                    <th>Status</th>
                     <th />
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-if="serviceFees.length === 0">
-                    <td colspan="7" class="text-center py-24 text-gray-500 dark:text-slate-400">
-                      <p>No service fees found</p>
+                  <tr v-if="parkingServices.length === 0">
+                    <td colspan="8" class="text-center py-24 text-gray-500 dark:text-slate-400">
+                      <p>No parking services found</p>
                     </td>
                   </tr>
-                  <tr v-for="fee in serviceFees" :key="fee.id">
-                    <td data-label="ID">{{ fee.id }}</td>
-                    <td data-label="Parking Lot">{{ fee.parking_lot_name }}</td>
-                    <td data-label="Vehicle Type">{{ fee.vehicle_type_name }}</td>
-                    <td data-label="Service">{{ fee.service_name }}</td>
-                    <td data-label="Add-on Services">
-                      <div class="flex flex-wrap gap-1">
-                        <span 
-                          v-for="id in fee.add_on_services" 
-                          :key="id"
-                          class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs dark:bg-blue-900 dark:text-blue-200"
-                        >
-                          {{ addOnServices.find(s => s.id === id)?.name }}
-                        </span>
-                        <span v-if="!fee.add_on_services || fee.add_on_services.length === 0" class="text-gray-500">
-                          None
-                        </span>
-                      </div>
+                  <tr v-for="service in parkingServices" :key="service.id">
+                    <td data-label="ID">{{ service.id }}</td>
+                    <td data-label="Parking Lot">{{ service.parkingLot.name }}</td>
+                    <td data-label="Vehicle Type">{{ service.vehicleType }}</td>
+                    <td data-label="Name">{{ service.name }}</td>
+                    <td data-label="Description">{{ service.description }}</td>
+                    <td data-label="Price">${{ service.price }}</td>
+                    <td data-label="Status">
+                      <BaseBadge
+                        :color="service.status === 'active' ? 'success' : 'danger'"
+                        :label="service.status"
+                      />
                     </td>
-                    <td data-label="Price">${{ fee.price }}</td>
                     <td class="before:hidden lg:w-1 whitespace-nowrap">
                       <BaseButtons type="justify-start lg:justify-end" no-wrap>
                         <BaseButton
                           color="info"
                           :icon="mdiPencil"
                           small
-                          @click="editServiceFee(fee)"
+                          @click="editService(service)"
                         />
                         <BaseButton
                           color="danger"
                           :icon="mdiClose"
                           small
-                          @click="deactivateServiceFee(fee.id)"
+                          @click="deleteService(service.id)"
                         />
                       </BaseButtons>
                     </td>
@@ -179,116 +173,155 @@
         <!-- Form Section -->
         <div class="w-full md:w-1/3">
           <CardBox>
-            <h2 class="text-xl font-bold mb-4">{{ isEditing ? 'Edit Fee' : 'Create New Fee' }}</h2>
-            <form @submit.prevent="handleSubmit">
-              <div class="mb-4">
-                <label class="block text-sm font-medium mb-2">Parking Lot</label>
-                <select
-                  v-model="form.id_parking_lot"
-                  class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
-                  required
-                >
-                  <option v-for="lot in parkingLots" :key="lot.id" :value="lot.id">
-                    {{ lot.name }}
-                  </option>
-                </select>
-              </div>
-              <div class="mb-4">
-                <label class="block text-sm font-medium mb-2">Vehicle Type</label>
-                <select
-                  v-model="form.id_vehicle_type"
-                  class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
-                  required
-                >
-                  <option v-for="type in vehicleTypes" :key="type.id" :value="type.id">
-                    {{ type.name }}
-                  </option>
-                </select>
-              </div>
-              <div v-if="activeTab === 'standard'" class="mb-4">
-                <label class="block text-sm font-medium mb-2">Price per Hour</label>
-                <input
-                  v-model="form.price_x_hours"
-                  type="number"
-                  step="0.01"
-                  class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
-                  required
-                />
-              </div>
-              <div v-if="activeTab === 'standard'" class="mb-4">
-                <label class="block text-sm font-medium mb-2">12 Hours Price</label>
-                <input
-                  v-model="form.price_x_12_hours"
-                  type="number"
-                  step="0.01"
-                  class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
-                  required
-                />
-              </div>
-              <div v-if="activeTab === 'monthly'" class="mb-4">
-                <label class="block text-sm font-medium mb-2">Monthly Price</label>
-                <input
-                  v-model="form.price"
-                  type="number"
-                  step="0.01"
-                  class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
-                  required
-                />
-              </div>
-              <div v-if="activeTab === 'services'" class="mb-4">
-                <label class="block text-sm font-medium mb-2">Service</label>
-                <select
-                  v-model="form.id_service"
-                  class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
-                  required
-                >
-                  <option v-for="service in services" :key="service.id" :value="service.id">
-                    {{ service.name }}
-                  </option>
-                </select>
-              </div>
-              <div v-if="activeTab === 'services'" class="mb-4">
-                <label class="block text-sm font-medium mb-2">Add-on Services</label>
-                <div class="space-y-2 max-h-48 overflow-y-auto p-2 border rounded dark:bg-slate-700 dark:border-slate-600">
-                  <label v-for="service in addOnServices" :key="service.id" class="flex items-center space-x-2 p-2 hover:bg-gray-100 dark:hover:bg-slate-600 rounded">
-                    <input
-                      type="checkbox"
-                      :value="service.id"
-                      v-model="form.add_on_services"
-                      class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                    />
-                    <span>{{ service.name }} - ${{ service.price }}</span>
-                  </label>
+            <h2 class="text-xl font-bold mb-4">{{ isEditing ? 'Edit' : 'Create' }} {{ activeTab === 'standard' ? 'Standard' : activeTab === 'monthly' ? 'Monthly' : 'Service' }} Fee</h2>
+            <form @submit.prevent="handleSubmit" class="space-y-4">
+              <!-- Standard Fees Form -->
+              <div v-if="activeTab === 'standard'">
+                <div class="mb-4">
+                  <label class="block text-sm font-medium mb-2">Parking Lot</label>
+                  <select
+                    v-model="form.id_parking_lot"
+                    class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
+                    required
+                  >
+                    <option value="">Select a parking lot</option>
+                    <option v-for="lot in parkingLots" :key="lot.id" :value="lot.id">
+                      {{ lot.name }}
+                    </option>
+                  </select>
+                </div>
+                <div class="mb-4">
+                  <label class="block text-sm font-medium mb-2">Vehicle Type</label>
+                  <select
+                    v-model="form.vehicleType"
+                    class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
+                    required
+                  >
+                    <option value="">Select a vehicle type</option>
+                    <option v-for="type in vehicleTypes" :key="type.idVehicleType" :value="type.idVehicleType">
+                      {{ type.name }}
+                    </option>
+                  </select>
+                </div>
+                <div class="mb-4">
+                  <label class="block text-sm font-medium mb-2">Price per Hour</label>
+                  <input
+                    v-model="form.price_x_hours"
+                    type="number"
+                    step="0.01"
+                    class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
+                    required
+                  />
+                </div>
+                <div class="mb-4">
+                  <label class="block text-sm font-medium mb-2">Price per 12 Hours</label>
+                  <input
+                    v-model="form.price_x_12_hours"
+                    type="number"
+                    step="0.01"
+                    class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
+                    required
+                  />
                 </div>
               </div>
-              <div v-if="activeTab === 'services'" class="mb-4">
-                <label class="block text-sm font-medium mb-2">Service Price</label>
-                <input
-                  v-model="form.price"
-                  type="number"
-                  step="0.01"
-                  class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
-                  required
-                />
+
+              <!-- Monthly Fees Form -->
+              <div v-if="activeTab === 'monthly'">
+                <div class="mb-4">
+                  <label class="block text-sm font-medium mb-2">Parking Lot</label>
+                  <select
+                    v-model="form.id_parking_lot"
+                    class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
+                    required
+                  >
+                    <option value="">Select a parking lot</option>
+                    <option v-for="lot in parkingLots" :key="lot.id" :value="lot.id">
+                      {{ lot.name }}
+                    </option>
+                  </select>
+                </div>
+                <div class="mb-4">
+                  <label class="block text-sm font-medium mb-2">Vehicle Type</label>
+                  <select
+                    v-model="form.vehicleType"
+                    class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
+                    required
+                  >
+                    <option value="">Select a vehicle type</option>
+                    <option v-for="type in vehicleTypes" :key="type.idVehicleType" :value="type.idVehicleType">
+                      {{ type.name }}
+                    </option>
+                  </select>
+                </div>
+                <div class="mb-4">
+                  <label class="block text-sm font-medium mb-2">Monthly Price</label>
+                  <input
+                    v-model="form.price"
+                    type="number"
+                    step="0.01"
+                    class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
+                    required
+                  />
+                </div>
               </div>
-              <div class="mb-4">
-                <label class="block text-sm font-medium mb-2">Status</label>
-                <select
-                  v-model="form.status"
-                  class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
-                  required
-                >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
+
+              <!-- Services Form (existing code) -->
+              <div v-if="activeTab === 'services'">
+                <div class="mb-4">
+                  <label class="block text-sm font-medium mb-2">Name</label>
+                  <input
+                    v-model="form.name"
+                    type="text"
+                    class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
+                    required
+                    placeholder="Enter service name"
+                  />
+                </div>
+                <div class="mb-4">
+                  <label class="block text-sm font-medium mb-2">Description</label>
+                  <textarea
+                    v-model="form.description"
+                    class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
+                    required
+                    placeholder="Enter service description"
+                    rows="3"
+                  ></textarea>
+                </div>
+                <div class="mb-4">
+                  <label class="block text-sm font-medium mb-2">Price</label>
+                  <input
+                    v-model="form.price"
+                    type="number"
+                    step="0.01"
+                    class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
+                    required
+                  />
+                </div>
+                <div class="mb-4">
+                  <label class="block text-sm font-medium mb-2">Status</label>
+                  <select
+                    v-model="form.status"
+                    class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
+                    required
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
               </div>
-              <div class="flex justify-end">
-                <button
+
+              <div class="flex justify-end gap-2">
+                <BaseButton
                   type="submit"
-                  class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-                >
-                  {{ isEditing ? 'Update' : 'Create' }}
-                </button>
+                  color="info"
+                  :label="isEditing ? 'Update' : 'Create'"
+                />
+                <BaseButton
+                  v-if="isEditing"
+                  color="danger"
+                  label="Cancel"
+                  @click="resetForm"
+                />
               </div>
             </form>
           </CardBox>
@@ -307,47 +340,46 @@ import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.
 import CardBox from '@/components/CardBox.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import BaseButton from '@/components/BaseButton.vue'
+import BaseBadge from '@/components/BaseBadge.vue'
 import { standardFeesService } from '@/services/standardFeesService'
 import { monthlyFeesService } from '@/services/monthlyFeesService'
-import { serviceFeesService } from '@/services/serviceFeesService'
+import { addOnServicesService } from '@/services/addOnServicesService'
 import { parkingLotsService } from '@/services/parkingLotsService'
 import { vehicleTypesService } from '@/services/vehicleTypesService'
-import { servicesService } from '@/services/servicesService'
-import { addOnServicesService } from '@/services/addOnServicesService'
 
 const tabs = [
-  { key: 'standard', label: 'Standard' },
-  { key: 'monthly', label: 'Monthly' },
-  { key: 'services', label: 'Services' }
+  { key: 'standard', label: 'Standard Fees' },
+  { key: 'monthly', label: 'Monthly Fees' },
+  { key: 'services', label: 'Parking Services' }
 ]
 
 const activeTab = ref('standard')
 const standardFees = ref([])
 const monthlyFees = ref([])
-const serviceFees = ref([])
+const parkingServices = ref([])
 const parkingLots = ref([])
 const vehicleTypes = ref([])
-const services = ref([])
-const addOnServices = ref([])
 const isEditing = ref(false)
 
 const form = ref({
+  id: null,
   id_parking_lot: '',
-  id_vehicle_type: '',
-  id_service: '',
-  price_x_hours: '',
-  price_x_12_hours: '',
-  price: '',
-  status: 'active',
-  add_on_services: []
+  vehicleType: '',
+  name: '',
+  description: '',
+  price: 0,
+  price_x_hours: 0,
+  price_x_12_hours: 0,
+  status: 'active'
 })
 
-const getStatusClass = (status) => {
-  const classes = {
-    active: 'text-green-600 dark:text-green-400',
-    inactive: 'text-red-600 dark:text-red-400'
+const loadVehicleTypes = async () => {
+  try {
+    const types = await vehicleTypesService.getAllVehicleTypes()
+    vehicleTypes.value = types
+  } catch (error) {
+    console.error('Error loading vehicle types:', error)
   }
-  return classes[status] || ''
 }
 
 const editStandardFee = (fee) => {
@@ -382,22 +414,6 @@ const deactivateMonthlyFee = async (id) => {
   }
 }
 
-const editServiceFee = (fee) => {
-  isEditing.value = true
-  form.value = { ...fee }
-}
-
-const deactivateServiceFee = async (id) => {
-  if (confirm('Are you sure you want to deactivate this fee?')) {
-    try {
-      await serviceFeesService.updateServiceFee(id, { status: 'inactive' })
-      await loadServiceFees()
-    } catch (error) {
-      console.error('Error deactivating service fee:', error)
-    }
-  }
-}
-
 const loadStandardFees = async () => {
   try {
     const fees = await standardFeesService.getAllStandardFees()
@@ -416,100 +432,111 @@ const loadMonthlyFees = async () => {
   }
 }
 
-const loadServiceFees = async () => {
+const loadParkingServices = async () => {
   try {
-    const fees = await serviceFeesService.getAllServiceFees()
-    serviceFees.value = fees.filter(fee => fee.status === 'active')
+    const services = await addOnServicesService.getAllAddOnServices()
+    parkingServices.value = services
   } catch (error) {
-    console.error('Error loading service fees:', error)
+    console.error('Error loading parking services:', error)
   }
 }
 
 const loadParkingLots = async () => {
   try {
     const lots = await parkingLotsService.getAllParkingLots()
-    parkingLots.value = lots
+    parkingLots.value = lots.map(lot => ({
+      id: lot.idParkingLot,
+      name: lot.name
+    }))
   } catch (error) {
     console.error('Error loading parking lots:', error)
   }
 }
 
-const loadVehicleTypes = async () => {
-  try {
-    const types = await vehicleTypesService.getAllVehicleTypes()
-    vehicleTypes.value = types
-  } catch (error) {
-    console.error('Error loading vehicle types:', error)
+const editService = (service) => {
+  form.value = {
+    id: service.id,
+    id_parking_lot: service.parkingLot.idParkingLot,
+    vehicleType: service.vehicleType,
+    name: service.name,
+    description: service.description,
+    price: service.price,
+    status: service.status
+  }
+  isEditing.value = true
+}
+
+const deleteService = async (id) => {
+  if (confirm('Are you sure you want to delete this service?')) {
+    try {
+      await addOnServicesService.deleteAddOnService(id)
+      await loadParkingServices()
+    } catch (error) {
+      console.error('Error deleting service:', error)
+    }
   }
 }
 
-const loadServices = async () => {
-  try {
-    const svcs = await servicesService.getAllServices()
-    services.value = svcs
-  } catch (error) {
-    console.error('Error loading services:', error)
+const resetForm = () => {
+  form.value = {
+    id: null,
+    id_parking_lot: '',
+    vehicleType: '',
+    name: '',
+    description: '',
+    price: 0,
+    price_x_hours: 0,
+    price_x_12_hours: 0,
+    status: 'active'
   }
-}
-
-const loadAddOnServices = async () => {
-  try {
-    const svcs = await addOnServicesService.getAllAddOnServices()
-    addOnServices.value = svcs
-  } catch (error) {
-    console.error('Error loading add-on services:', error)
-  }
+  isEditing.value = false
 }
 
 const handleSubmit = async () => {
   try {
-    if (isEditing.value) {
-      if (activeTab.value === 'standard') {
-        await standardFeesService.updateStandardFee(form.value.id, form.value)
-      } else if (activeTab.value === 'monthly') {
-        await monthlyFeesService.updateMonthlyFee(form.value.id, form.value)
-      } else if (activeTab.value === 'services') {
-        // Ensure add_on_services is an array of IDs
-        const feeData = {
-          ...form.value,
-          add_on_services: Array.isArray(form.value.add_on_services) 
-            ? form.value.add_on_services 
-            : [form.value.add_on_services].filter(Boolean)
-        }
-        await serviceFeesService.updateServiceFee(form.value.id, feeData)
+    if (activeTab.value === 'services') {
+      if (form.value.id) {
+        await addOnServicesService.updateAddOnService(form.value.id, form.value)
+      } else {
+        await addOnServicesService.createAddOnService(form.value)
       }
-    } else {
-      if (activeTab.value === 'standard') {
-        await standardFeesService.createStandardFee(form.value)
-      } else if (activeTab.value === 'monthly') {
-        await monthlyFeesService.createMonthlyFee(form.value)
-      } else if (activeTab.value === 'services') {
-        // Ensure add_on_services is an array of IDs
-        const feeData = {
-          ...form.value,
-          add_on_services: Array.isArray(form.value.add_on_services) 
-            ? form.value.add_on_services 
-            : [form.value.add_on_services].filter(Boolean)
-        }
-        await serviceFeesService.createServiceFee(feeData)
+      await loadParkingServices()
+    } else if (activeTab.value === 'standard') {
+      const standardFeeData = {
+        id_parking_lot: parseInt(form.value.id_parking_lot),
+        id_vehicle_type: parseInt(form.value.vehicleType),
+        price_x_hours: parseFloat(form.value.price_x_hours),
+        price_x_12_hours: parseFloat(form.value.price_x_12_hours),
+        status: 'active'
       }
+      console.log('Creating standard fee with data:', standardFeeData)
+      if (form.value.id) {
+        await standardFeesService.updateStandardFee(form.value.id, standardFeeData)
+      } else {
+        const response = await standardFeesService.createStandardFee(standardFeeData)
+        console.log('Standard fee created:', response)
+      }
+      await loadStandardFees()
+    } else if (activeTab.value === 'monthly') {
+      const monthlyFeeData = {
+        id_parking_lot: parseInt(form.value.id_parking_lot),
+        id_vehicle_type: parseInt(form.value.vehicleType),
+        price: parseFloat(form.value.price),
+        status: 'active'
+      }
+      console.log('Creating monthly fee with data:', monthlyFeeData)
+      if (form.value.id) {
+        await monthlyFeesService.updateMonthlyFee(form.value.id, monthlyFeeData)
+      } else {
+        const response = await monthlyFeesService.createMonthlyFee(monthlyFeeData)
+        console.log('Monthly fee created:', response)
+      }
+      await loadMonthlyFees()
     }
-    
-    // Reload data after submission
-    await loadData()
-    form.value = {
-      id_parking_lot: '',
-      id_vehicle_type: '',
-      id_service: '',
-      price_x_hours: '',
-      price_x_12_hours: '',
-      price: '',
-      status: 'active',
-      add_on_services: []
-    }
-    isEditing.value = false
+    resetForm()
   } catch (error) {
-    console.error('Error submitting form:', error)
+    console.error('Error saving fee:', error)
+    alert('Error saving fee: ' + (error.response?.data?.message || error.message))
   }
 }
 
@@ -517,13 +544,12 @@ const loadData = async () => {
   await Promise.all([
     loadStandardFees(),
     loadMonthlyFees(),
-    loadServiceFees(),
+    loadParkingServices(),
     loadParkingLots(),
-    loadVehicleTypes(),
-    loadServices(),
-    loadAddOnServices()
+    loadVehicleTypes()
   ])
 }
 
 onMounted(loadData)
-</script> 
+</script>
+

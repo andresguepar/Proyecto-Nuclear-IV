@@ -127,7 +127,7 @@
       </div>
     </div>
     <!-- New Map Section Below Table and Form -->
-    <div id="google-parking-map" class="w-full h-96 mt-4 rounded-lg border border-gray-300"></div>
+    <div id="parking-lots-map" class="w-full h-96 mt-4 rounded-lg border border-gray-300"></div>
   </div>
 </template>
 
@@ -222,11 +222,16 @@ const fetchParkingLots = async () => {
 
 onMounted(async () => {
   await fetchParkingLots()
-  // Assume Google Maps API is loaded globally, just initialize the map
-  if (window.google) {
-    initGoogleMap()
+  if (window.google && window.google.maps && window.google.maps.places) {
+    initParkingLotsMap()
   } else {
-    console.error('Google Maps API not loaded globally')
+    // Si Google Maps no está cargado, cargarlo y luego inicializar
+    const script = document.createElement('script')
+    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCSWk47E6T5IrOjDyXA3d3pzG-DyIMVrs8&libraries=places&callback=initParkingLotsMap`
+    script.async = true
+    script.defer = true
+    window.initParkingLotsMap = initParkingLotsMap
+    document.head.appendChild(script)
   }
 })
 
@@ -235,60 +240,112 @@ const map = ref(null)
 const placesService = ref(null)
 const markers = ref([])
 
-const initGoogleMap = () => {
-  if (!window.google) {
-    console.error('Google Maps API not loaded')
+const initParkingLotsMap = () => {
+  if (!window.google || !window.google.maps || !window.google.maps.places) {
+    console.error('Google Maps API or Places service not loaded')
     return
   }
-  map.value = new google.maps.Map(document.getElementById('google-parking-map'), {
-    center: { lat: 4.5333, lng: -75.6833 }, // Armenia, Quindio
-    zoom: 14
-  })
-  placesService.value = new google.maps.places.PlacesService(map.value)
-  searchNearbyParkingLots()
+
+  try {
+    map.value = new google.maps.Map(document.getElementById('parking-lots-map'), {
+      center: { lat: 4.5333, lng: -75.6833 }, // Armenia, Quindio
+      zoom: 14
+    })
+
+    // Inicializar el servicio Places después de crear el mapa
+    placesService.value = new google.maps.places.PlacesService(map.value)
+    
+    // Mostrar los estacionamientos registrados en el mapa
+    parkingLots.value.forEach(lot => {
+      if (lot.coordX && lot.coordY) {
+        const marker = new google.maps.Marker({
+          position: { lat: parseFloat(lot.coordX), lng: parseFloat(lot.coordY) },
+          map: map.value,
+          title: lot.name,
+          icon: {
+            url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+          }
+        })
+        
+        // Agregar información al hacer clic en el marcador
+        const infoWindow = new google.maps.InfoWindow({
+          content: `
+            <div>
+              <h3>${lot.name}</h3>
+              <p>${lot.address}</p>
+              <p>Tel: ${lot.phone}</p>
+              <p>NIT: ${lot.nit}</p>
+              <p>Estado: ${lot.isActive ? 'Activo' : 'Inactivo'}</p>
+            </div>
+          `
+        })
+        
+        marker.addListener('click', () => {
+          infoWindow.open(map.value, marker)
+        })
+        
+        markers.value.push(marker)
+      }
+    })
+    
+    // Solo buscar estacionamientos cercanos si el servicio Places está disponible
+    if (placesService.value) {
+      searchNearbyParkingLots()
+    }
+  } catch (error) {
+    console.error('Error initializing map:', error)
+  }
 }
 
 const clearMarkers = () => {
-  markers.value.forEach(marker => marker.setMap(null))
-  markers.value = []
+  if (markers.value) {
+    markers.value.forEach(marker => marker.setMap(null))
+    markers.value = []
+  }
 }
 
 const searchNearbyParkingLots = () => {
-  if (!placesService.value || !map.value) return
-  const request = {
-    query: 'parking lots in Armenia Quindio',
-    location: map.value.getCenter(),
-    radius: 5000
+  if (!placesService.value || !map.value) {
+    console.warn('Places service or map not initialized')
+    return
   }
-  console.log('Google Places textSearch request:', request)
-  placesService.value.textSearch(request, (results, status) => {
-    console.log('Google Places textSearch status:', status)
-    if (status === google.maps.places.PlacesServiceStatus.OK) {
-      clearMarkers()
-      console.log('Google Places textSearch results:', results)
-      results.forEach(place => {
-        const marker = new google.maps.Marker({
-          position: place.geometry.location,
-          map: map.value,
-          title: place.name,
-          icon: {
-            url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+
+  try {
+    const request = {
+      query: 'parking lots in Armenia Quindio',
+      location: map.value.getCenter(),
+      radius: 5000
+    }
+
+    placesService.value.textSearch(request, (results, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+        clearMarkers()
+        results.forEach(place => {
+          if (place.geometry && place.geometry.location) {
+            const marker = new google.maps.Marker({
+              position: place.geometry.location,
+              map: map.value,
+              title: place.name,
+              icon: {
+                url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+              }
+            })
+            marker.addListener('click', () => {
+              form.value.name = place.name || ''
+              form.value.address = place.formatted_address || place.vicinity || ''
+              form.value.coordX = place.geometry.location.lat()
+              form.value.coordY = place.geometry.location.lng()
+              isEditing.value = false
+            })
+            markers.value.push(marker)
           }
         })
-        marker.addListener('click', () => {
-          form.value.name = place.name || ''
-          form.value.address = place.formatted_address || place.vicinity || ''
-          form.value.coordX = place.geometry.location.lat()
-          form.value.coordY = place.geometry.location.lng()
-          isEditing.value = false
-        })
-        markers.value.push(marker)
-      })
-    } else {
-      console.warn('Google Places textSearch failed with status:', status)
-    }
-  }).catch(error => {
+      } else {
+        console.warn('Google Places textSearch failed with status:', status)
+      }
+    })
+  } catch (error) {
     console.error('Error during textSearch:', error)
-  })
+  }
 }
 </script>

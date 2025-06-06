@@ -25,26 +25,45 @@ export const monthlyFeesService = {
   },
 
   async createMonthlyFee(feeData) {
+    console.log('Raw fee data received:', feeData)
     const transformedData = {
-      price: feeData.price,
+      price: parseFloat(feeData.price),
       isActive: feeData.status === 'active',
       parkingLot: {
-        idParkingLot: feeData.id_parking_lot
+        idParkingLot: parseInt(feeData.id_parking_lot)
       },
       vehicleType: {
-        idVehicleType: feeData.id_vehicle_type
+        idVehicleType: parseInt(feeData.id_vehicle_type)
       }
     }
-    const response = await axios.post(`${API_URL}/save`, transformedData)
-    return {
-      ...response.data,
-      status: response.data.isActive ? 'active' : 'inactive',
-      parking_lot_name: response.data.parkingLot?.name,
-      vehicle_type_name: response.data.vehicleType?.name
+    console.log('Sending transformed data to backend:', JSON.stringify(transformedData, null, 2))
+    try {
+      const response = await axios.post(`${API_URL}/save`, transformedData)
+      console.log('Backend response:', response.data)
+      return {
+        ...response.data,
+        status: response.data.isActive ? 'active' : 'inactive',
+        parking_lot_name: response.data.parkingLot?.name,
+        vehicle_type_name: response.data.vehicleType?.name
+      }
+    } catch (error) {
+      console.error('Error creating monthly fee:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        headers: error.response?.headers,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          data: error.config?.data
+        }
+      })
+      throw error
     }
   },
 
   async updateMonthlyFee(id, feeData) {
+    console.log('Transforming monthly fee update data:', feeData)
     const transformedData = {
       idMonthlyFee: id,
       price: feeData.price,
@@ -56,12 +75,19 @@ export const monthlyFeesService = {
         idVehicleType: feeData.id_vehicle_type
       }
     }
-    const response = await axios.post(`${API_URL}/save`, transformedData)
-    return {
-      ...response.data,
-      status: response.data.isActive ? 'active' : 'inactive',
-      parking_lot_name: response.data.parkingLot?.name,
-      vehicle_type_name: response.data.vehicleType?.name
+    console.log('Sending transformed update data to backend:', transformedData)
+    try {
+      const response = await axios.post(`${API_URL}/save`, transformedData)
+      console.log('Backend update response:', response.data)
+      return {
+        ...response.data,
+        status: response.data.isActive ? 'active' : 'inactive',
+        parking_lot_name: response.data.parkingLot?.name,
+        vehicle_type_name: response.data.vehicleType?.name
+      }
+    } catch (error) {
+      console.error('Error updating monthly fee:', error.response?.data || error)
+      throw error
     }
   },
 

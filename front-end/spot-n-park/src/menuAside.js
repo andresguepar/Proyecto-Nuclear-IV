@@ -1,5 +1,4 @@
 import {
-  mdiAccountCircle,
   mdiMonitor,
   mdiGithub,
   mdiLock,
@@ -16,7 +15,6 @@ import {
   mdiBookMarker,
   mdiCar,
   mdiCashMultiple,
-  mdiCarWrench,
   mdiCalendarMonth,
   mdiAccountMultiple,
   mdiViewDashboard,
@@ -30,14 +28,14 @@ export default [
     label: 'Home',
   },
   {
-    to: '/slots',
-    icon: mdiCar,
-    label: 'Slots',
-  },
-  {
     to: '/reservations',
     icon: mdiBookMarker,
     label: 'Reservations',
+  },
+    {
+    to: '/slots',
+    icon: mdiCar,
+    label: 'Slots',
   },
   {
     to: '/dashboard',
@@ -48,11 +46,6 @@ export default [
     to: '/fees',
     icon: mdiCashMultiple,
     label: 'Fees',
-  },
-  {
-    to: '/services',
-    icon: mdiCarWrench,
-    label: 'Services',
   },
   {
     to: '/schedules',

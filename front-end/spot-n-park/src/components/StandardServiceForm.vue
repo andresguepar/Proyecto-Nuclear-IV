@@ -1,12 +1,12 @@
 <script setup>
-import {ref, onMounted} from 'vue'
+import {ref, onMounted, watch} from 'vue'
 import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
 import BaseButton from '@/components/BaseButton.vue'
-import { parkingLotsService } from '@/services/parkingLotsService'
+import { vehicleTypesService } from '@/services/vehicleTypesService'
 
 const form = ref({
-  parkingLot: '',
+  vehicleType: '',
   startDate: '',
   startTime: '',
   plate: '',
@@ -14,41 +14,67 @@ const form = ref({
   duration: '1'
 })
 
-const parkingLots = ref([])
+const vehicleTypes = ref([])
+const availableVehicleTypes = ref([])
 
-const handleSearch = () => {
-  console.log('Searching with:', form.value)
+const emit = defineEmits(['form-update', 'vehicle-type-change'])
+
+const isFormValid = () => {
+  return (
+    form.value.vehicleType &&
+    form.value.startDate &&
+    form.value.startTime &&
+    form.value.plate
+  )
 }
 
-const fetchParkingLots = async () => {
+const handleSearch = () => {
+  if (!isFormValid()) {
+    alert('Por favor completa todos los campos para buscar parqueaderos disponibles.')
+    return
+  }
+  emit('form-update', form.value)
+}
+
+const fetchVehicleTypes = async () => {
   try {
-    const lots = await parkingLotsService.getAllParkingLots()
-    parkingLots.value = lots.map(lot => ({
-      value: lot.id,
-      label: lot.name
+    const types = await vehicleTypesService.getAllVehicleTypes()
+    vehicleTypes.value = types.map(type => ({
+      value: type.idVehicleType,
+      label: type.name
     }))
+    availableVehicleTypes.value = vehicleTypes.value
   } catch (error) {
-    console.error('Error fetching parking lots:', error)
+    console.error('Error fetching vehicle types:', error)
   }
 }
 
-onMounted(() => {
-  fetchParkingLots()
+watch(() => form.value.vehicleType, (newVehicleType) => {
+  emit('vehicle-type-change', {
+    vehicleTypeId: newVehicleType
+  })
 })
 
-defineEmits(['form-update'])
+watch(() => form.value.startDate, (newDate) => {
+  console.log('Date changed in form:', newDate)
+  emit('form-update', form.value)
+})
+
+onMounted(async () => {
+  await fetchVehicleTypes()
+})
 </script>
 
 <template>
   <div class="space-y-4">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-      <FormField label="Parking Lot" class="text-sm">
+      <FormField label="Vehicle Type" class="text-sm">
         <FormControl
-          v-model="form.parkingLot"
+          v-model="form.vehicleType"
           type="select"
-          placeholder="Select parking lot"
+          placeholder="Select vehicle type"
           class="h-10 text-sm"
-          :options="parkingLots"
+          :options="availableVehicleTypes"
         />
       </FormField>
       <FormField label="Date" class="text-sm">
@@ -73,11 +99,12 @@ defineEmits(['form-update'])
           class="h-10 text-sm"
         />
       </FormField>
-      <div class="self-center">
+      <div class="self-center flex items-end">
         <BaseButton
           color="info"
           label="Search"
           class="h-13 w-full"
+          :disabled="!isFormValid()"
           @click="handleSearch"
         />
       </div>
