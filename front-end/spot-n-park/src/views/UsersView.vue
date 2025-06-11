@@ -1,8 +1,7 @@
 <template>
-  <LayoutAuthenticated>
+  <LayoutRoleBased>
     <SectionMain>
       <SectionTitleLineWithButton :icon="mdiAccountMultiple" title="Users" main />
-      
       <CardBox has-table>
         <table>
           <thead>
@@ -27,44 +26,58 @@
               <td data-label="Role">{{ user.role?.name || 'N/A' }}</td>
               <td class="before:hidden lg:w-1 whitespace-nowrap">
                 <BaseButtons type="justify-start lg:justify-end" no-wrap>
-                  <BaseButton
-                    color="info"
-                    :icon="mdiPencil"
-                    small
-                    @click="editUser(user)"
-                  />
-                  <BaseButton
-                    color="danger"
-                    :icon="mdiClose"
-                    small
-                    @click="deactivateUser(user.idUser)"
-                  />
+                  <BaseButton color="info" :icon="mdiPencil" small @click="editUser(user)" />
+                  <BaseButton color="danger" :icon="mdiClose" small @click="deactivateUser(user.idUser)" />
                 </BaseButtons>
               </td>
             </tr>
           </tbody>
         </table>
       </CardBox>
+      <CardBox class="mt-8" is-form @submit.prevent="createUser">
+        <h3 class="text-lg font-bold mb-4">Crear nuevo usuario</h3>
+        <FormField label="Nombre de Usuario">
+          <FormControl v-model="newUser.username" name="username" />
+        </FormField>
+        <FormField label="Email">
+          <FormControl v-model="newUser.email" name="email" type="email" />
+        </FormField>
+        <FormField label="Contraseña">
+          <FormControl v-model="newUser.password" name="password" type="password" />
+        </FormField>
+        <FormField label="Teléfono">
+          <FormControl v-model="newUser.phone" name="phone" type="tel" />
+        </FormField>
+        <FormField label="Rol">
+          <select v-model="newUser.id_role" class="form-select">
+            <option value="2">basic_user</option>
+            <option value="3">park_admin</option>
+            <option value="1">super_admin</option>
+          </select>
+        </FormField>
+        <BaseButton type="submit" color="info" label="Crear usuario" class="w-full mt-4" />
+        <div v-if="error" class="text-red-600 text-sm mt-2 text-center">{{ error }}</div>
+      </CardBox>
     </SectionMain>
-  </LayoutAuthenticated>
+  </LayoutRoleBased>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { mdiAccountMultiple, mdiPencil, mdiClose } from '@mdi/js'
-import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
+import LayoutRoleBased from '@/layouts/LayoutRoleBased.vue'
 import SectionMain from '@/components/SectionMain.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import CardBox from '@/components/CardBox.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import BaseButton from '@/components/BaseButton.vue'
+import FormField from '@/components/FormField.vue'
+import FormControl from '@/components/FormControl.vue'
 import { usersService } from '@/services/usersService'
 
 const users = ref([])
-
-const getStatusClass = (isActive) => {
-  return isActive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-}
+const newUser = ref({ username: '', email: '', password: '', phone: '', id_role: 2 })
+const error = ref('')
 
 const editUser = (user) => {
   console.log('Edit user:', user)
@@ -75,8 +88,8 @@ const deactivateUser = async (id) => {
     try {
       await usersService.updateUser(id, { isActive: false })
       await fetchUsers()
-    } catch (error) {
-      console.error('Error deactivating user:', error)
+    } catch {
+      // Manejo simple de error
     }
   }
 }
@@ -85,13 +98,31 @@ const fetchUsers = async () => {
   try {
     const allUsers = await usersService.getAllUsers()
     users.value = allUsers.filter(user => user.isActive)
-  } catch (error) {
-    console.error('Error fetching users:', error)
+  } catch {
     users.value = []
+  }
+}
+
+const createUser = async () => {
+  error.value = ''
+  try {
+    await usersService.createUser({
+      idUser: undefined,
+      name: newUser.value.username,
+      email: newUser.value.email,
+      password: newUser.value.password,
+      phone: newUser.value.phone,
+      isActive: true,
+      id_role: newUser.value.id_role
+    })
+    newUser.value = { username: '', email: '', password: '', phone: '', id_role: 2 }
+    await fetchUsers()
+  } catch {
+    error.value = 'Error al crear usuario.'
   }
 }
 
 onMounted(() => {
   fetchUsers()
 })
-</script> 
+</script>

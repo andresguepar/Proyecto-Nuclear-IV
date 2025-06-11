@@ -1,8 +1,7 @@
 <script setup>
-import {reactive} from 'vue'
+import {reactive, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {mdiAccount, mdiAsterisk} from '@mdi/js'
-import SectionFullScreen from '@/components/SectionFullScreen.vue'
 import CardBox from '@/components/CardBox.vue'
 import FormCheckRadio from '@/components/FormCheckRadio.vue'
 import FormField from '@/components/FormField.vue'
@@ -10,17 +9,32 @@ import FormControl from '@/components/FormControl.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import LayoutGuest from '@/layouts/LayoutGuest.vue'
+import { useAuthStore } from '@/stores/auth.js'
 
 const form = reactive({
-  login: 'john.doe',
-  pass: 'highly-secure-password-fYjUw-',
+  login: '',
+  pass: '',
   remember: true,
 })
 
+const error = ref('')
+const authStore = useAuthStore()
 const router = useRouter()
 
-const submit = () => {
-  router.push('/dashboard')
+const submit = async () => {
+  error.value = ''
+  const success = await authStore.login(form.login, form.pass)
+  if (success) {
+    console.log('Login successful, redirecting...')
+    // Recargar la página después del login exitoso
+    window.location.href = '/'
+  } else {
+    error.value = 'Credenciales incorrectas.'
+  }
+}
+
+const goHome = () => {
+  router.push('/')
 }
 </script>
 
@@ -70,7 +84,7 @@ const submit = () => {
           <template #footer>
             <BaseButtons>
               <BaseButton type="submit" color="info" label="Login" />
-              <BaseButton to="/dashboard" color="info" outline label="Back" />
+              <BaseButton @click="goHome" color="info" outline label="Back" />
             </BaseButtons>
           </template>
         </CardBox>

@@ -34,6 +34,10 @@ const componentClass = computed(() => [
 const hasDropdown = computed(() => !!props.item.menu)
 
 const menuClick = (event) => {
+  console.log('MenuItem click:', props.item) // Para debugging
+  if (props.item.isLogout) {
+    event.preventDefault()
+  }
   emit('menu-click', event, props.item)
 
   if (hasDropdown.value) {

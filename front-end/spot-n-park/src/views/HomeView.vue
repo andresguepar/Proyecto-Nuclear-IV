@@ -2,7 +2,7 @@
   <LayoutAuthenticated>
     <SectionMain>
       <div class="flex justify-center mb-6">
-        <img src="@/assets/images/spotnpark-logo-home.png" alt="SpotNPark Logo" class="h-100" />
+        <img src="@/assets/images/spotnpark-logo-home.png" alt="SpotNPark Logo" class="h-120" />
       </div>
       <div class="mt-4 text-center font-semibold text-3xl mb-6" style="color: #0e2338;">
         <span style="color: #e1ebf5;">Book </span>
@@ -35,16 +35,6 @@
             >
               Monthly
             </button>
-            <button
-              class="px-4 py-1.5 text-sm font-medium border-b-2 transition-colors duration-150"
-              :class="{
-                'border-blue-500 text-blue-600': activeTab === 'services',
-                'border-transparent hover:border-gray-300': activeTab !== 'services',
-              }"
-              @click="activeTab = 'services'"
-            >
-              Services
-            </button>
           </div>
         </div>
       </CardBox>
@@ -62,28 +52,6 @@
             @form-update="handleFormUpdate"
             @vehicle-type-change="handleVehicleTypeChange"
           />
-          <div v-else-if="activeTab === 'services'" class="p-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div v-for="service in parkingServices" :key="service.id" class="bg-white dark:bg-slate-800 rounded-lg shadow p-4">
-                <h3 class="text-lg font-semibold mb-2">{{ service.name }}</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ service.description }}</p>
-                <div class="flex justify-between items-center">
-                  <span class="text-lg font-bold text-blue-600 dark:text-blue-400">${{ service.price }}</span>
-                  <BaseButton
-                    color="info"
-                    label="Select"
-                    small
-                    @click="selectService(service)"
-                  />
-                </div>
-                <div class="mt-2 text-sm text-gray-500">
-                  <span class="inline-block px-2 py-1 rounded-full" :class="service.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-                    {{ service.status }}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
         </CardBoxComponentBody>
       </CardBox>
 
@@ -218,12 +186,10 @@ import { parkingLotsService } from '@/services/parkingLotsService'
 import { slotsService } from '@/services/slotsService'
 import { standardFeesService } from '@/services/standardFeesService'
 import { monthlyFeesService } from '@/services/monthlyFeesService'
-import { addOnServicesService } from '@/services/addOnServicesService'
-import { schedulesService } from '@/services/schedulesService'
+import { schedulesService } from '@/services/schedulesService.js'
 
 const activeTab = ref('standart')
 const parkingLots = ref([])
-const parkingServices = ref([])
 const map = ref(null)
 const markers = ref([])
 const parkingLotsData = ref([])
@@ -249,8 +215,18 @@ const selectedVehicleTypeName = ref('')
 const showParkingLots = ref([])
 const selectedAddOnServices = ref([])
 const filteredAddOnServices = ref([])
-const addOnServicesFee = ref([])
 const addOnServicesTotal = ref(0)
+const allAddOnServices = ref([])
+
+const updateFilteredAddOnServices = (lotId) => {
+  filteredAddOnServices.value = allAddOnServices.value.filter(service => service.parkingLot?.idParkingLot === lotId && service.status === 'active')
+  addOnServicesTotal.value = selectedAddOnServices.value.reduce((acc, s) => acc + (s.price || 0), 0)
+}
+
+const handleAddOnServicesChange = (selected) => {
+  selectedAddOnServices.value = selected
+  addOnServicesTotal.value = selected.reduce((acc, s) => acc + (s.price || 0), 0)
+}
 
 // Computed property to get schedule for selected date
 const getScheduleForDate = (parkingLotId, selectedDate) => {
@@ -319,18 +295,6 @@ const getAvailableSlots = (parkingLotId, vehicleTypeId) => {
     slot.vehicleType?.idVehicleType === vehicleTypeId &&
     slot.isActive
   ).length
-}
-
-// Computed property to get fee for a parking lot and vehicle type
-const getFee = (parkingLotId, vehicleTypeId) => {
-  if (!vehicleTypeId) return null
-
-  const fees = activeTab.value === 'standart' ? standardFees.value : monthlyFees.value
-  return fees.find(fee =>
-    fee.parkingLot?.idParkingLot === parkingLotId &&
-    fee.vehicleType?.idVehicleType === vehicleTypeId &&
-    fee.status === 'active'
-  )
 }
 
 const handleFormUpdate = (formData) => {
@@ -453,12 +417,19 @@ const updateParkingLotsDisplay = () => {
 
     console.log('Selected vehicle type name:', selectedVehicleTypeName)
 
+    // Obtener el precio a mostrar según el tipo de tarifa
+    let displayPrice = 'Price not available'
+    if (fee) {
+      if (activeTab.value === 'standart') {
+        displayPrice = `$${fee.priceForHours}/hour`
+      } else {
+        displayPrice = `$${fee.price}/month`
+      }
+    }
+
     return {
       ...lot,
-      price: fee ? (activeTab.value === 'standart' ?
-        `$${fee.priceForHours}/hour` :
-        `$${fee.price}/month`) :
-        'Price not available',
+      price: displayPrice,
       selectedVehicleTypeName,
       hours: formatScheduleTime(schedule),
       availableSlots: availableSlotsCount
@@ -598,13 +569,13 @@ watch(() => form.value.startDate, (newDate, oldDate) => {
 const fetchParkingLotsWithInfo = async () => {
   try {
     // Get all required data
-    const [lots, fees, schedules, slots] = await Promise.all([
+    const [lots, fees, slots, schedules] = await Promise.all([
       parkingLotsService.getAllParkingLots(),
       activeTab.value === 'standart' ?
         standardFeesService.getAllStandardFees() :
         monthlyFeesService.getAllMonthlyFees(),
-      schedulesService.getAllDailySchedules(),
-      slotsService.getSlotsByIsActive(true)
+      slotsService.getSlotsByIsActive(true),
+      schedulesService.getAllDailySchedules()
     ])
 
     console.log('Fetched parking lots:', lots)
@@ -643,42 +614,13 @@ const fetchParkingLotsWithInfo = async () => {
   }
 }
 
-const fetchParkingServices = async () => {
-  try {
-    const services = await addOnServicesService.getAllAddOnServices()
-    parkingServices.value = services.filter(service => service.status === 'active')
-  } catch (error) {
-    console.error('Error fetching parking services:', error)
-  }
-}
-
-const selectService = (service) => {
-  console.log('Selected service:', service)
-  // Aquí puedes implementar la lógica para seleccionar un servicio
-}
-
 const addHours = (lot) => {
   selectedLot.value = lot
   selectedStartTime.value = form.value.startTime
   selectedPlate.value = form.value.plate
   selectedVehicleTypeName.value = lot.selectedVehicleTypeName || ''
-  // Filtrar servicios adicionales activos para este parqueadero
-  filteredAddOnServices.value = parkingServices.value.filter(service => service.parkingLot?.idParkingLot === lot.id && service.status === 'active')
-  selectedAddOnServices.value = []
-  addOnServicesFee.value = []
-  addOnServicesTotal.value = 0
+  updateFilteredAddOnServices(lot.id)
   showReservationModal.value = true
-}
-
-// Manejar selección de servicios desde el modal
-const handleAddOnServicesChange = (selected) => {
-  selectedAddOnServices.value = selected
-  addOnServicesFee.value = selected.map(service => ({
-    id: service.id,
-    name: service.name,
-    price: service.price
-  }))
-  addOnServicesTotal.value = selected.reduce((sum, s) => sum + Number(s.price), 0)
 }
 
 const handleReservationComplete = () => {
@@ -763,13 +705,7 @@ onMounted(async () => {
     // Luego cargar los datos
     await Promise.all([
       fetchParkingLotsWithInfo(),
-      fetchParkingServices()
     ])
-
-    // Inicializar el mapa después de que todo esté cargado
-    if (window.google) {
-      initHomeMap()
-    }
   } catch (error) {
     console.error('Error during initialization:', error)
   }
