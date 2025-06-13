@@ -1,5 +1,4 @@
 import {
-  mdiAccountCircle,
   mdiMonitor,
   mdiGithub,
   mdiLock,
@@ -16,7 +15,6 @@ import {
   mdiBookMarker,
   mdiCar,
   mdiCashMultiple,
-  mdiCarWrench,
   mdiCalendarMonth,
   mdiAccountMultiple,
   mdiViewDashboard,
@@ -28,46 +26,49 @@ export default [
     to: '/',
     icon: mdiHome,
     label: 'Home',
-  },
-  {
-    to: '/slots',
-    icon: mdiCar,
-    label: 'Slots',
+    roles: ['basic_user', 'park_admin', 'super_admin']
   },
   {
     to: '/reservations',
     icon: mdiBookMarker,
     label: 'Reservations',
+    roles: ['basic_user', 'park_admin', 'super_admin']
+  },
+  {
+    to: '/slots',
+    icon: mdiCar,
+    label: 'Slots',
+    roles: ['park_admin', 'super_admin']
   },
   {
     to: '/dashboard',
     icon: mdiMonitor,
     label: 'Dashboard',
+    roles: ['park_admin', 'super_admin']
   },
   {
     to: '/fees',
     icon: mdiCashMultiple,
     label: 'Fees',
-  },
-  {
-    to: '/services',
-    icon: mdiCarWrench,
-    label: 'Services',
+    roles: ['park_admin', 'super_admin']
   },
   {
     to: '/schedules',
     icon: mdiCalendarMonth,
     label: 'Schedules',
+    roles: ['park_admin', 'super_admin']
   },
   {
     to: '/parking-lots',
     icon: mdiParking,
     label: 'Parking Lots',
+    roles: ['park_admin', 'super_admin']
   },
   {
     to: '/users',
     icon: mdiAccountMultiple,
     label: 'Users',
+    roles: ['super_admin']
   },
   {
     label: 'Dropdown',

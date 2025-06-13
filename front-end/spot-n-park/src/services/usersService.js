@@ -54,4 +54,4 @@ export const usersService = {
     const response = await axios.delete(`${API_URL}/delete/${id}`)
     return response.data
   }
-} 
+}

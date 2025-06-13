@@ -4,13 +4,24 @@ const API_URL = 'http://localhost:8080/vehicle-types'
 
 export const vehicleTypesService = {
   async getAllVehicleTypes() {
-    const response = await axios.get(`${API_URL}/get`)
-    return response.data
+    try {
+      const response = await axios.get(`${API_URL}/get`)
+      console.log('Vehicle types loaded:', response.data)
+      return response.data
+    } catch (error) {
+      console.error('Error loading vehicle types:', error.response?.data || error)
+      throw error
+    }
   },
 
   async getVehicleTypeById(id) {
-    const response = await axios.get(`${API_URL}/get/${id}`)
-    return response.data
+    try {
+      const response = await axios.get(`${API_URL}/get/${id}`)
+      return response.data
+    } catch (error) {
+      console.error('Error loading vehicle type:', error.response?.data || error)
+      throw error
+    }
   },
 
   async createVehicleType(vehicleTypeData) {

@@ -1,6 +1,10 @@
 import {createRouter, createWebHashHistory} from 'vue-router'
-import Style from '@/views/StyleView.vue'
 import Home from '@/views/HomeView.vue'
+import { useAuthStore } from '@/stores/auth.js'
+import { createPinia } from 'pinia'
+
+const pinia = createPinia()
+const authStore = useAuthStore(pinia)
 
 const routes = [
  /* {
@@ -12,10 +16,9 @@ const routes = [
     component: Style,
   },*/
   {
-        // Document title tag
-    // We combine it with defaultDocumentTitle set in `src/main.js` on router.afterEach hook
     meta: {
       title: 'Home',
+      requiresAuth: true
     },
     path: '/',
     name: 'home',
@@ -24,6 +27,8 @@ const routes = [
   {
     meta: {
       title: 'Slots',
+      requiresAuth: true,
+      roles: ['park_admin', 'super_admin']
     },
     path: '/slots',
     name: 'slots',
@@ -32,6 +37,7 @@ const routes = [
   {
     meta: {
       title: 'Reservations',
+      requiresAuth: true
     },
     path: '/reservations',
     name: 'reservations',
@@ -40,6 +46,8 @@ const routes = [
   {
     meta: {
       title: 'Dashboard',
+      requiresAuth: true,
+      roles: ['park_admin', 'super_admin']
     },
     path: '/dashboard',
     name: 'dashboard',
@@ -48,15 +56,18 @@ const routes = [
   {
     meta: {
       title: 'Parking Lots',
+      requiresAuth: true,
+      roles: ['park_admin', 'super_admin']
     },
     path: '/parking-lots',
     name: 'parking-lots',
     component: () => import('@/views/ParkingLotsView.vue'),
   },
-  
   {
     meta: {
       title: 'Schedules',
+      requiresAuth: true,
+      roles: ['park_admin', 'super_admin']
     },
     path: '/schedules',
     name: 'schedules',
@@ -65,6 +76,8 @@ const routes = [
   {
     meta: {
       title: 'Fees',
+      requiresAuth: true,
+      roles: ['park_admin', 'super_admin']
     },
     path: '/fees',
     name: 'fees',
@@ -73,6 +86,8 @@ const routes = [
   {
     meta: {
       title: 'Users',
+      requiresAuth: true,
+      roles: ['super_admin']
     },
     path: '/users',
     name: 'users',
@@ -97,6 +112,7 @@ const routes = [
   {
     meta: {
       title: 'Profile',
+      requiresAuth: true
     },
     path: '/profile',
     name: 'profile',
@@ -121,6 +137,7 @@ const routes = [
   {
     meta: {
       title: 'Login',
+      requiresAuth: false
     },
     path: '/login',
     name: 'login',
@@ -129,6 +146,7 @@ const routes = [
   {
     meta: {
       title: 'Error',
+      requiresAuth: false
     },
     path: '/error',
     name: 'error',
@@ -137,6 +155,7 @@ const routes = [
   {
     meta: {
       title: 'Recuperar contraseña',
+      requiresAuth: false
     },
     path: '/forgot-password',
     name: 'forgot-password',
@@ -145,6 +164,7 @@ const routes = [
   {
     meta: {
       title: 'Registro de usuario',
+      requiresAuth: false
     },
     path: '/register',
     name: 'register',
@@ -158,6 +178,35 @@ const router = createRouter({
   scrollBehavior(to, from, savedPosition) {
     return savedPosition || { top: 0 }
   },
+})
+
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = authStore.isAuthenticated()
+  const role = authStore.role
+
+  // Si la ruta requiere autenticación
+  if (to.meta.requiresAuth) {
+    // Si no está autenticado, redirige a login
+    if (!isAuthenticated) {
+      console.log('Not authenticated, redirecting to login')
+      return next('/login')
+    }
+
+    // Si la ruta requiere roles específicos
+    if (to.meta.roles && !to.meta.roles.includes(role)) {
+      console.log('Role not authorized, redirecting to home')
+      return next('/')
+    }
+  }
+
+  // Si está autenticado y trata de acceder a login/register, redirige a home
+  if (isAuthenticated && ['/login', '/register', '/forgot-password'].includes(to.path)) {
+    console.log('Already authenticated, redirecting to home')
+    return next('/')
+  }
+
+  console.log('Navigation allowed:', { to: to.path, isAuthenticated, role })
+  next()
 })
 
 export default router

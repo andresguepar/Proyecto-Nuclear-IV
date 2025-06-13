@@ -1,21 +1,23 @@
+// ...existing code from LayoutAuthenticated.vue...
+// Este layout es para usuarios con rol super_admin
 <script setup>
-import {mdiBackburger, mdiForwardburger, mdiMenu} from '@mdi/js'
-import {ref, computed} from 'vue'
-import {useRouter} from 'vue-router'
-import menuAside from '@/menuAside.js'
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import menuNavBar from '@/menuNavBar.js'
-import {useDarkModeStore} from '@/stores/darkMode.js'
+import { useDarkModeStore } from '@/stores/darkMode.js'
 import BaseIcon from '@/components/BaseIcon.vue'
 import NavBar from '@/components/NavBar.vue'
 import NavBarItemPlain from '@/components/NavBarItemPlain.vue'
 import AsideMenu from '@/components/AsideMenu.vue'
 import FooterBar from '@/components/FooterBar.vue'
+import menuAside from '@/menuAside.js'
 import { useAuthStore } from '@/stores/auth.js'
+import { mdiBackburger, mdiForwardburger, mdiMenu } from '@mdi/js'
+
 
 const darkModeStore = useDarkModeStore()
 const router = useRouter()
 const authStore = useAuthStore()
-
 const isAsideMobileExpanded = ref(false)
 const isAsideLgActive = ref(false)
 
@@ -25,13 +27,13 @@ router.beforeEach(() => {
 })
 
 const allowedMenu = computed(() => {
-  console.log('Current role:', authStore.role)
+  console.log('Current role:', authStore.role) // Para debugging
   const filteredMenu = menuAside.filter(item => {
     const hasAccess = item.roles?.includes(authStore.role)
-    console.log(`Menu item ${item.label}: ${hasAccess ? 'allowed' : 'denied'}`)
+    console.log(`Menu item ${item.label}: ${hasAccess ? 'allowed' : 'denied'}`) // Para debugging
     return hasAccess
   })
-  console.log('Filtered menu:', filteredMenu)
+  console.log('Filtered menu:', filteredMenu) // Para debugging
   return filteredMenu
 })
 
@@ -39,7 +41,6 @@ const menuClick = (event, item) => {
   if (item.isToggleLightDark) {
     darkModeStore.set()
   }
-
   if (item.isLogout) {
     authStore.logout()
     router.push('/login')
@@ -50,11 +51,7 @@ const isAuthenticated = computed(() => authStore.isAuthenticated())
 </script>
 
 <template>
-  <div
-    :class="{
-      'overflow-hidden lg:overflow-visible': isAsideMobileExpanded,
-    }"
-  >
+  <div :class="{ 'overflow-hidden lg:overflow-visible': isAsideMobileExpanded }">
     <div
       :class="[
         {
@@ -95,9 +92,9 @@ const isAuthenticated = computed(() => authStore.isAuthenticated())
       </NavBar>
       <AsideMenu
         v-if="isAuthenticated"
+        :menu="allowedMenu"
         :is-aside-mobile-expanded="isAsideMobileExpanded"
         :is-aside-lg-active="isAsideLgActive"
-        :menu="allowedMenu"
         @menu-click="menuClick"
         @aside-lg-close-click="isAsideLgActive = false"
         class="transition-all duration-300 ease-in-out"
@@ -106,7 +103,6 @@ const isAuthenticated = computed(() => authStore.isAuthenticated())
         :class="{
           'transition-all duration-300 ease-in-out': true,
 
-
         }"
       >
         <slot />
@@ -114,9 +110,7 @@ const isAuthenticated = computed(() => authStore.isAuthenticated())
       <FooterBar>
         <footer class="py-2 mx-auto">
           <div class="text-center">
-            <p class="text-sm text-gray-500">
-              &copy; {{ new Date().getFullYear() }} Spot N Park. All rights reserved.
-            </p>
+            <p class="text-sm text-gray-500">&copy; {{ new Date().getFullYear() }} Spot N Park. All rights reserved.</p>
           </div>
         </footer>
       </FooterBar>

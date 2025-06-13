@@ -1,12 +1,13 @@
 <script setup>
-import {ref} from 'vue'
+import {ref, computed} from 'vue'
 import {mdiClose, mdiDotsVertical} from '@mdi/js'
 import {containerMaxW} from '@/config.js'
 import BaseIcon from '@/components/BaseIcon.vue'
 import NavBarMenuList from '@/components/NavBarMenuList.vue'
 import NavBarItemPlain from '@/components/NavBarItemPlain.vue'
+import { useAuthStore } from '@/stores/auth.js'
 
-defineProps({
+const props = defineProps({
   menu: {
     type: Array,
     required: true,
@@ -14,12 +15,22 @@ defineProps({
 })
 
 const emit = defineEmits(['menu-click'])
+const authStore = useAuthStore()
 
 const menuClick = (event, item) => {
   emit('menu-click', event, item)
 }
 
 const isMenuNavBarActive = ref(false)
+
+const isAuthenticated = computed(() => authStore.isAuthenticated())
+const username = computed(() => authStore.user?.username || '')
+
+function reloadOnLogin(e) {
+  // Forzar recarga al ir a login desde HomeView/NavBar
+  e.preventDefault();
+  window.location.href = '/#/login';
+}
 </script>
 
 <template>
@@ -39,7 +50,24 @@ const isMenuNavBarActive = ref(false)
         class="max-h-screen-menu overflow-y-auto lg:overflow-visible absolute w-screen top-14 left-0 bg-gray-50 shadow-lg lg:w-auto lg:flex lg:static lg:shadow-none dark:bg-slate-800"
         :class="[isMenuNavBarActive ? 'block' : 'hidden']"
       >
-        <NavBarMenuList :menu="menu" @menu-click="menuClick" />
+        <template v-if="isAuthenticated">
+          <div class="flex items-center px-4 py-2 border-b border-gray-200 dark:border-slate-700">
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
+              {{ username }}
+            </span>
+          </div>
+          <NavBarMenuList :menu="menu" @menu-click="menuClick" />
+        </template>
+        <template v-else>
+          <div class="flex items-center px-4 py-2">
+            <router-link to="/login" class="text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mr-4" @click.native="reloadOnLogin">
+              Iniciar Sesión
+            </router-link>
+            <router-link to="/register" class="text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+              Registrarse
+            </router-link>
+          </div>
+        </template>
       </div>
     </div>
   </nav>
