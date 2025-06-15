@@ -20,8 +20,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,9 +27,6 @@ class MonthlyFeeServiceTest {
 
     @Mock
     private MonthlyFeeRepository monthlyFeeRepository;
-
-    @Mock
-    private MonthlyFeeMapper monthlyFeeMapper;
 
     @InjectMocks
     private MonthlyFeeServiceImpl monthlyFeeService;
@@ -75,11 +70,6 @@ class MonthlyFeeServiceTest {
             100.0,
             true
         );
-
-        // Configurar stubs para el mapper usando matchers
-        when(monthlyFeeMapper.mapFrom(any(MonthlyFee.class))).thenReturn(monthlyFeeDto);
-        when(monthlyFeeMapper.mapFrom(any(MonthlyFeeDto.class))).thenReturn(monthlyFee);
-        when(monthlyFeeMapper.mapFrom(anyList())).thenReturn(Arrays.asList(monthlyFeeDto));
     }
 
     @Test
@@ -96,13 +86,12 @@ class MonthlyFeeServiceTest {
         assertEquals(1, result.size());
         assertEquals(monthlyFeeDto.idMonthlyFee(), result.get(0).idMonthlyFee());
         verify(monthlyFeeRepository).findAll();
-        verify(monthlyFeeMapper).mapFrom(monthlyFees);
     }
 
     @Test
     void getMonthlyFeeById_WhenMonthlyFeeExists_ShouldReturnMonthlyFee() {
         // Arrange
-        when(monthlyFeeRepository.findById(eq(1))).thenReturn(Optional.of(monthlyFee));
+        when(monthlyFeeRepository.findById(1)).thenReturn(Optional.of(monthlyFee));
 
         // Act
         Optional<MonthlyFeeDto> result = monthlyFeeService.getMonthlyFeeById(1);
@@ -112,13 +101,12 @@ class MonthlyFeeServiceTest {
         assertEquals(monthlyFeeDto.idMonthlyFee(), result.get().idMonthlyFee());
         assertEquals(monthlyFeeDto.price(), result.get().price());
         verify(monthlyFeeRepository).findById(1);
-        verify(monthlyFeeMapper).mapFrom(any(MonthlyFee.class));
     }
 
     @Test
     void getMonthlyFeeById_WhenMonthlyFeeDoesNotExist_ShouldReturnEmpty() {
         // Arrange
-        when(monthlyFeeRepository.findById(eq(999))).thenReturn(Optional.empty());
+        when(monthlyFeeRepository.findById(999)).thenReturn(Optional.empty());
 
         // Act
         Optional<MonthlyFeeDto> result = monthlyFeeService.getMonthlyFeeById(999);
@@ -126,7 +114,6 @@ class MonthlyFeeServiceTest {
         // Assert
         assertTrue(result.isEmpty());
         verify(monthlyFeeRepository).findById(999);
-        verify(monthlyFeeMapper, never()).mapFrom(any(MonthlyFee.class));
     }
 
     @Test
@@ -141,15 +128,13 @@ class MonthlyFeeServiceTest {
         assertNotNull(result);
         assertEquals(monthlyFeeDto.idMonthlyFee(), result.idMonthlyFee());
         assertEquals(monthlyFeeDto.price(), result.price());
-        verify(monthlyFeeMapper).mapFrom(any(MonthlyFeeDto.class));
         verify(monthlyFeeRepository).save(any(MonthlyFee.class));
-        verify(monthlyFeeMapper).mapFrom(any(MonthlyFee.class));
     }
 
     @Test
     void deleteMonthlyFee_WhenMonthlyFeeExists_ShouldMarkAsInactive() {
         // Arrange
-        when(monthlyFeeRepository.findById(eq(1))).thenReturn(Optional.of(monthlyFee));
+        when(monthlyFeeRepository.findById(1)).thenReturn(Optional.of(monthlyFee));
         when(monthlyFeeRepository.save(any(MonthlyFee.class))).thenReturn(monthlyFee);
 
         // Act
@@ -164,7 +149,7 @@ class MonthlyFeeServiceTest {
     @Test
     void deleteMonthlyFee_WhenMonthlyFeeDoesNotExist_ShouldThrowException() {
         // Arrange
-        when(monthlyFeeRepository.findById(eq(999))).thenReturn(Optional.empty());
+        when(monthlyFeeRepository.findById(999)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(RuntimeException.class, () -> monthlyFeeService.deleteMonthlyFee(999));
@@ -176,7 +161,7 @@ class MonthlyFeeServiceTest {
     void getMonthlyFeesByIsActive_ShouldReturnFilteredMonthlyFees() {
         // Arrange
         List<MonthlyFee> monthlyFees = Arrays.asList(monthlyFee);
-        when(monthlyFeeRepository.findByIsActive(eq(true))).thenReturn(monthlyFees);
+        when(monthlyFeeRepository.findByIsActive(true)).thenReturn(monthlyFees);
 
         // Act
         List<MonthlyFeeDto> result = monthlyFeeService.getMonthlyFeesByIsActive(true);
@@ -186,6 +171,5 @@ class MonthlyFeeServiceTest {
         assertEquals(1, result.size());
         assertEquals(monthlyFeeDto.idMonthlyFee(), result.get(0).idMonthlyFee());
         verify(monthlyFeeRepository).findByIsActive(true);
-        verify(monthlyFeeMapper).mapFrom(anyList());
     }
 }
