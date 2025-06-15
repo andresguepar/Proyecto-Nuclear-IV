@@ -6,10 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pn.proyectonuclear4.mapping.dto.UserDto;
 import pn.proyectonuclear4.entity.Role;
 import pn.proyectonuclear4.entity.User;
-import pn.proyectonuclear4.exception.ResourceNotFoundException;
+import pn.proyectonuclear4.mapping.dto.UserDto;
 import pn.proyectonuclear4.mapping.mappers.UserMapper;
 import pn.proyectonuclear4.repository.UserRepository;
 import pn.proyectonuclear4.service.impl.UserServiceImpl;
@@ -208,9 +207,9 @@ class UserServiceTest {
             .thenReturn(null);
 
         // Act & Assert
-        assertThrows(NullPointerException.class, 
+        assertThrows(NullPointerException.class,
             () -> userService.getUserByUsernameAndPassWord("wronguser", "wrongpass"));
         verify(userRepository).findByUsernameAndPassword("wronguser", "wrongpass");
         verify(userMapper, never()).mapFrom(any(User.class));
     }
-} 
+}

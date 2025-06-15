@@ -2,7 +2,9 @@ package pn.proyectonuclear4.mapping.mappers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pn.proyectonuclear4.entity.*;
+import pn.proyectonuclear4.entity.ParkingLot;
+import pn.proyectonuclear4.entity.Slot;
+import pn.proyectonuclear4.entity.VehicleType;
 import pn.proyectonuclear4.mapping.dto.SlotDto;
 
 import java.util.Arrays;
@@ -161,4 +163,4 @@ class SlotMapperTest {
         assertNotNull(entities);
         assertTrue(entities.isEmpty());
     }
-} 
+}

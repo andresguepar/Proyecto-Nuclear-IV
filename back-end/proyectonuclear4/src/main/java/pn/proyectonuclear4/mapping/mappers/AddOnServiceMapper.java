@@ -2,25 +2,32 @@ package pn.proyectonuclear4.mapping.mappers;
 
 import pn.proyectonuclear4.entity.AddOnService;
 import pn.proyectonuclear4.mapping.dto.AddOnServiceDto;
-import lombok.Builder;
+import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Builder
+@Component
 public class AddOnServiceMapper {
-    public static AddOnServiceDto mapFrom(AddOnService source) {
-        return AddOnServiceDto.builder()
-                .idAddOnService(source.getIdAddOnService())
-                .name(source.getName())
-                .description(source.getDescription())
-                .price(source.getPrice())
-                .isActive(source.getIsActive())
-                .parkingLot(source.getParkingLot())
-                .build();
+    public AddOnServiceDto mapFrom(AddOnService source) {
+        if (source == null) {
+            return null;
+        }
+        return new AddOnServiceDto(
+            source.getIdAddOnService(),
+            source.getName(),
+            source.getDescription(),
+            source.getPrice(),
+            source.getIsActive(),
+            source.getParkingLot()
+        );
     }
 
-    public static AddOnService mapFrom(AddOnServiceDto source) {
+    public AddOnService mapFrom(AddOnServiceDto source) {
+        if (source == null) {
+            return null;
+        }
         return AddOnService.builder()
                 .idAddOnService(source.idAddOnService())
                 .name(source.name())
@@ -31,11 +38,21 @@ public class AddOnServiceMapper {
                 .build();
     }
 
-    public static List<AddOnServiceDto> mapFrom(List<AddOnService> source) {
-        return source.stream().map(AddOnServiceMapper::mapFrom).collect(Collectors.toList());
+    public List<AddOnServiceDto> mapFrom(List<AddOnService> source) {
+        if (source == null) {
+            return Collections.emptyList();
+        }
+        return source.stream()
+                .map(this::mapFrom)
+                .collect(Collectors.toList());
     }
 
-    public static List<AddOnService> mapToEntities(List<AddOnServiceDto> source) {
-        return source.stream().map(AddOnServiceMapper::mapFrom).collect(Collectors.toList());
+    public List<AddOnService> mapToEntities(List<AddOnServiceDto> source) {
+        if (source == null) {
+            return Collections.emptyList();
+        }
+        return source.stream()
+                .map(this::mapFrom)
+                .collect(Collectors.toList());
     }
 }

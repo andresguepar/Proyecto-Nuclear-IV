@@ -6,12 +6,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pn.proyectonuclear4.mapping.dto.SlotDto;
-import pn.proyectonuclear4.entity.Slot;
 import pn.proyectonuclear4.entity.ParkingLot;
+import pn.proyectonuclear4.entity.Slot;
 import pn.proyectonuclear4.entity.VehicleType;
+import pn.proyectonuclear4.mapping.dto.SlotDto;
 import pn.proyectonuclear4.mapping.mappers.SlotMapper;
+import pn.proyectonuclear4.repository.ParkingLotRepository;
 import pn.proyectonuclear4.repository.SlotRepository;
+import pn.proyectonuclear4.repository.VehicleTypeRepository;
 import pn.proyectonuclear4.service.impl.SlotServiceImpl;
 
 import java.util.Arrays;
@@ -29,6 +31,12 @@ class SlotServiceTest {
     private SlotRepository slotRepository;
 
     @Mock
+    private ParkingLotRepository parkingLotRepository;
+
+    @Mock
+    private VehicleTypeRepository vehicleTypeRepository;
+
+    @Mock
     private SlotMapper slotMapper;
 
     @InjectMocks
@@ -44,10 +52,11 @@ class SlotServiceTest {
         parkingLot = ParkingLot.builder()
                 .idParkingLot(1)
                 .address("Test Address")
-                .latitude(10.0)
-                .longitude(20.0)
-                .contactPhone("123456789")
-                .contactEmail("test@test.com")
+                .coordX("10.0")
+                .coordY("20.0")
+                .name("Test Parking Lot")
+                .nit("123456789")
+                .phone("123456789")
                 .isActive(true)
                 .build();
 
@@ -59,7 +68,7 @@ class SlotServiceTest {
 
         slot = Slot.builder()
                 .idSlot(1)
-                .slotName("A1")
+                .name("A1")
                 .isAvailable(true)
                 .isActive(true)
                 .parkingLot(parkingLot)
@@ -71,8 +80,8 @@ class SlotServiceTest {
             "A1",
             true,
             true,
-            1,
-            1
+            parkingLot,
+            vehicleType
         );
     }
 
@@ -107,7 +116,7 @@ class SlotServiceTest {
         // Assert
         assertTrue(result.isPresent());
         assertEquals(slotDto.idSlot(), result.get().idSlot());
-        assertEquals(slotDto.slotName(), result.get().slotName());
+        assertEquals(slotDto.name(), result.get().name());
         verify(slotRepository).findById(1);
         verify(slotMapper).mapFrom(slot);
     }
@@ -139,7 +148,7 @@ class SlotServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(slotDto.idSlot(), result.idSlot());
-        assertEquals(slotDto.slotName(), result.slotName());
+        assertEquals(slotDto.name(), result.name());
         verify(slotMapper).mapFrom(slotDto);
         verify(slotRepository).save(any(Slot.class));
         verify(slotMapper).mapFrom(slot);
@@ -195,7 +204,9 @@ class SlotServiceTest {
         // Arrange
         List<Slot> slots = Arrays.asList(slot);
         List<SlotDto> expectedDtos = Arrays.asList(slotDto);
-        when(slotRepository.findByParkingLotIdParkingLotAndVehicleTypeIdVehicleTypeAndIsAvailable(1, 1, true))
+        when(parkingLotRepository.findById(1)).thenReturn(Optional.of(parkingLot));
+        when(vehicleTypeRepository.findById(1)).thenReturn(Optional.of(vehicleType));
+        when(slotRepository.findByParkingLotAndVehicleTypeAndIsAvailable(parkingLot, vehicleType, true))
             .thenReturn(slots);
         when(slotMapper.mapFrom(any(Slot.class))).thenReturn(slotDto);
 
@@ -206,7 +217,9 @@ class SlotServiceTest {
         assertNotNull(result);
         assertEquals(expectedDtos.size(), result.size());
         assertEquals(expectedDtos.get(0).idSlot(), result.get(0).idSlot());
-        verify(slotRepository).findByParkingLotIdParkingLotAndVehicleTypeIdVehicleTypeAndIsAvailable(1, 1, true);
+        verify(parkingLotRepository).findById(1);
+        verify(vehicleTypeRepository).findById(1);
+        verify(slotRepository).findByParkingLotAndVehicleTypeAndIsAvailable(parkingLot, vehicleType, true);
         verify(slotMapper).mapFrom(any(Slot.class));
     }
-} 
+}

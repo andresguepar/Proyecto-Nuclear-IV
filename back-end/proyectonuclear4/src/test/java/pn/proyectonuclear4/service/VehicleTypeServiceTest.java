@@ -6,8 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pn.proyectonuclear4.mapping.dto.VehicleTypeDto;
 import pn.proyectonuclear4.entity.VehicleType;
+import pn.proyectonuclear4.mapping.dto.VehicleTypeDto;
 import pn.proyectonuclear4.mapping.mappers.VehicleTypeMapper;
 import pn.proyectonuclear4.repository.VehicleTypeRepository;
 import pn.proyectonuclear4.service.impl.VehicleTypeServiceImpl;
@@ -40,14 +40,12 @@ class VehicleTypeServiceTest {
         vehicleType = VehicleType.builder()
                 .idVehicleType(1)
                 .name("Car")
-                .description("Standard car")
                 .isActive(true)
                 .build();
 
         vehicleTypeDto = new VehicleTypeDto(
             1,
             "Car",
-            "Standard car",
             true
         );
     }
@@ -165,4 +163,4 @@ class VehicleTypeServiceTest {
         verify(vehicleTypeRepository).findByIsActive(true);
         verify(vehicleTypeMapper).mapFrom(any(VehicleType.class));
     }
-} 
+}

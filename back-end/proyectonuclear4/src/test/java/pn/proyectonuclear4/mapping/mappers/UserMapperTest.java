@@ -2,7 +2,8 @@ package pn.proyectonuclear4.mapping.mappers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pn.proyectonuclear4.entity.*;
+import pn.proyectonuclear4.entity.Role;
+import pn.proyectonuclear4.entity.User;
 import pn.proyectonuclear4.mapping.dto.UserDto;
 
 import java.util.Arrays;
@@ -164,4 +165,4 @@ class UserMapperTest {
         assertNotNull(entities);
         assertTrue(entities.isEmpty());
     }
-} 
+}

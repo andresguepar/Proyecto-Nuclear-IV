@@ -8,9 +8,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import pn.proyectonuclear4.entity.Fee;
 import pn.proyectonuclear4.entity.Payment;
 import pn.proyectonuclear4.entity.PaymentMethod;
-import pn.proyectonuclear4.entity.Fee;
 import pn.proyectonuclear4.exception.ResourceNotFoundException;
 import pn.proyectonuclear4.mapping.dto.PaymentDto;
 import pn.proyectonuclear4.mapping.mappers.PaymentMapper;
@@ -24,7 +24,6 @@ import java.util.Optional;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -181,4 +180,4 @@ class PaymentControllerTest {
 
         verify(paymentService).getPaymentsByUserId(1);
     }
-} 
+}

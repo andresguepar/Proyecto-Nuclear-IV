@@ -6,9 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pn.proyectonuclear4.mapping.dto.ScheduleDto;
-import pn.proyectonuclear4.entity.Schedule;
 import pn.proyectonuclear4.entity.ParkingLot;
+import pn.proyectonuclear4.entity.Schedule;
+import pn.proyectonuclear4.mapping.dto.ScheduleDto;
 import pn.proyectonuclear4.mapping.mappers.ScheduleMapper;
 import pn.proyectonuclear4.repository.ScheduleRepository;
 import pn.proyectonuclear4.service.impl.ScheduleServiceImpl;
@@ -172,4 +172,4 @@ class ScheduleServiceTest {
         verify(scheduleRepository).findByIsActive(true);
         verify(scheduleMapper).mapFrom(any(Schedule.class));
     }
-} 
+}

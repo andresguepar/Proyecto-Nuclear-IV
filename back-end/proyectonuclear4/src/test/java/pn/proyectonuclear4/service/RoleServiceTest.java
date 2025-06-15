@@ -6,8 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pn.proyectonuclear4.mapping.dto.RoleDto;
 import pn.proyectonuclear4.entity.Role;
+import pn.proyectonuclear4.mapping.dto.RoleDto;
 import pn.proyectonuclear4.mapping.mappers.RoleMapper;
 import pn.proyectonuclear4.repository.RoleRepository;
 import pn.proyectonuclear4.service.impl.RoleServiceImpl;
@@ -163,4 +163,4 @@ class RoleServiceTest {
         verify(roleRepository).findByIsActive(true);
         verify(roleMapper).mapFrom(any(Role.class));
     }
-} 
+}

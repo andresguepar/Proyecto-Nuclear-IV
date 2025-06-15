@@ -6,10 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pn.proyectonuclear4.mapping.dto.DailyScheduleDto;
 import pn.proyectonuclear4.entity.DailySchedule;
 import pn.proyectonuclear4.entity.Schedule;
 import pn.proyectonuclear4.entity.WeekDay;
+import pn.proyectonuclear4.mapping.dto.DailyScheduleDto;
 import pn.proyectonuclear4.mapping.mappers.DailyScheduleMapper;
 import pn.proyectonuclear4.repository.DailyScheduleRepository;
 import pn.proyectonuclear4.service.impl.DailyScheduleServiceImpl;
@@ -69,6 +69,11 @@ class DailyScheduleServiceTest {
             weekDay,
             true
         );
+
+        // Configurar stubs lenientes para el mapper
+        lenient().when(dailyScheduleMapper.mapFrom(any(DailySchedule.class))).thenReturn(dailyScheduleDto);
+        lenient().when(dailyScheduleMapper.mapFrom(any(DailyScheduleDto.class))).thenReturn(dailySchedule);
+        lenient().when(dailyScheduleMapper.mapFrom(anyList())).thenReturn(Arrays.asList(dailyScheduleDto));
     }
 
     @Test
@@ -77,7 +82,6 @@ class DailyScheduleServiceTest {
         List<DailySchedule> dailySchedules = Arrays.asList(dailySchedule);
         List<DailyScheduleDto> expectedDtos = Arrays.asList(dailyScheduleDto);
         when(dailyScheduleRepository.findAll()).thenReturn(dailySchedules);
-        when(dailyScheduleMapper.mapFrom(any(DailySchedule.class))).thenReturn(dailyScheduleDto);
 
         // Act
         List<DailyScheduleDto> result = dailyScheduleService.getAllDailySchedules();
@@ -87,14 +91,13 @@ class DailyScheduleServiceTest {
         assertEquals(expectedDtos.size(), result.size());
         assertEquals(expectedDtos.get(0).idDailySchedule(), result.get(0).idDailySchedule());
         verify(dailyScheduleRepository).findAll();
-        verify(dailyScheduleMapper).mapFrom(any(DailySchedule.class));
+        verify(dailyScheduleMapper).mapFrom(dailySchedules);
     }
 
     @Test
     void getDailyScheduleById_WhenDailyScheduleExists_ShouldReturnDailySchedule() {
         // Arrange
         when(dailyScheduleRepository.findById(1)).thenReturn(Optional.of(dailySchedule));
-        when(dailyScheduleMapper.mapFrom(dailySchedule)).thenReturn(dailyScheduleDto);
 
         // Act
         Optional<DailyScheduleDto> result = dailyScheduleService.getDailyScheduleById(1);
@@ -124,9 +127,7 @@ class DailyScheduleServiceTest {
     @Test
     void saveDailySchedule_ShouldReturnSavedDailySchedule() {
         // Arrange
-        when(dailyScheduleMapper.mapFrom(any(DailyScheduleDto.class))).thenReturn(dailySchedule);
         when(dailyScheduleRepository.save(any(DailySchedule.class))).thenReturn(dailySchedule);
-        when(dailyScheduleMapper.mapFrom(any(DailySchedule.class))).thenReturn(dailyScheduleDto);
 
         // Act
         DailyScheduleDto result = dailyScheduleService.saveDailySchedule(dailyScheduleDto);
@@ -172,7 +173,6 @@ class DailyScheduleServiceTest {
         List<DailySchedule> dailySchedules = Arrays.asList(dailySchedule);
         List<DailyScheduleDto> expectedDtos = Arrays.asList(dailyScheduleDto);
         when(dailyScheduleRepository.findByIsActive(true)).thenReturn(dailySchedules);
-        when(dailyScheduleMapper.mapFrom(any(DailySchedule.class))).thenReturn(dailyScheduleDto);
 
         // Act
         List<DailyScheduleDto> result = dailyScheduleService.getDailySchedulesByIsActive(true);
@@ -182,7 +182,7 @@ class DailyScheduleServiceTest {
         assertEquals(expectedDtos.size(), result.size());
         assertEquals(expectedDtos.get(0).idDailySchedule(), result.get(0).idDailySchedule());
         verify(dailyScheduleRepository).findByIsActive(true);
-        verify(dailyScheduleMapper).mapFrom(any(DailySchedule.class));
+        verify(dailyScheduleMapper).mapFrom(dailySchedules);
     }
 
     @Test
@@ -191,7 +191,6 @@ class DailyScheduleServiceTest {
         List<DailySchedule> dailySchedules = Arrays.asList(dailySchedule);
         List<DailyScheduleDto> expectedDtos = Arrays.asList(dailyScheduleDto);
         when(dailyScheduleRepository.findByWeekDayAndScheduleAndIsActive(1, 1)).thenReturn(dailySchedules);
-        when(dailyScheduleMapper.mapFrom(any(DailySchedule.class))).thenReturn(dailyScheduleDto);
 
         // Act
         List<DailyScheduleDto> result = dailyScheduleService.getDailySchedulesByWeekDayAndScheduleAndIsActive(1, 1, true);
@@ -201,6 +200,6 @@ class DailyScheduleServiceTest {
         assertEquals(expectedDtos.size(), result.size());
         assertEquals(expectedDtos.get(0).idDailySchedule(), result.get(0).idDailySchedule());
         verify(dailyScheduleRepository).findByWeekDayAndScheduleAndIsActive(1, 1);
-        verify(dailyScheduleMapper).mapFrom(any(DailySchedule.class));
+        verify(dailyScheduleMapper).mapFrom(dailySchedules);
     }
-} 
+}

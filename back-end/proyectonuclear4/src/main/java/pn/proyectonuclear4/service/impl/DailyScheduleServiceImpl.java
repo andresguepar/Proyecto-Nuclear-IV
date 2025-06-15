@@ -16,7 +16,6 @@ import pn.proyectonuclear4.service.DailyScheduleService;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 public class DailyScheduleServiceImpl implements DailyScheduleService {
@@ -24,22 +23,24 @@ public class DailyScheduleServiceImpl implements DailyScheduleService {
     @Autowired
     private DailyScheduleRepository dailyScheduleRepository;
 
+    @Autowired
+    private DailyScheduleMapper dailyScheduleMapper;
 
     @Override
     public List<DailyScheduleDto> getAllDailySchedules() {
         List<DailySchedule> dailySchedules = dailyScheduleRepository.findAll();
-        return DailyScheduleMapper.mapFrom(dailySchedules);
+        return dailyScheduleMapper.mapFrom(dailySchedules);
     }
 
     @Override
     public Optional<DailyScheduleDto> getDailyScheduleById(int id) {
         Optional<DailySchedule> dailySchedule = dailyScheduleRepository.findById(id);
-        return dailySchedule.map(DailyScheduleMapper::mapFrom);
+        return dailySchedule.map(dailyScheduleMapper::mapFrom);
     }
 
     @Override
     public DailyScheduleDto saveDailySchedule(DailyScheduleDto dailyScheduleDto) {
-        DailySchedule dailySchedule = DailyScheduleMapper.mapFrom(dailyScheduleDto);
+        DailySchedule dailySchedule = dailyScheduleMapper.mapFrom(dailyScheduleDto);
         
         // Asegurarse de que los tiempos estén en formato LocalTime
         if (dailyScheduleDto.startTime() != null) {
@@ -50,7 +51,7 @@ public class DailyScheduleServiceImpl implements DailyScheduleService {
         }
         
         DailySchedule savedDailySchedule = dailyScheduleRepository.save(dailySchedule);
-        return DailyScheduleMapper.mapFrom(savedDailySchedule);
+        return dailyScheduleMapper.mapFrom(savedDailySchedule);
     }
 
     @Override
@@ -64,12 +65,12 @@ public class DailyScheduleServiceImpl implements DailyScheduleService {
     @Override
     public List<DailyScheduleDto> getDailySchedulesByIsActive(Boolean isActive) {
         List<DailySchedule> dailySchedules = dailyScheduleRepository.findByIsActive(isActive);
-        return DailyScheduleMapper.mapFrom(dailySchedules);
+        return dailyScheduleMapper.mapFrom(dailySchedules);
     }
 
     @Override
     public List<DailyScheduleDto> getDailySchedulesByWeekDayAndScheduleAndIsActive(int scheduleId, int weekDayId, Boolean isActive) {
         List<DailySchedule> dailySchedules = dailyScheduleRepository.findByWeekDayAndScheduleAndIsActive(scheduleId, weekDayId);
-        return DailyScheduleMapper.mapFrom(dailySchedules);
+        return dailyScheduleMapper.mapFrom(dailySchedules);
     }
 }

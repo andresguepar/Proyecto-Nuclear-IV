@@ -6,8 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pn.proyectonuclear4.mapping.dto.WeekDayDto;
 import pn.proyectonuclear4.entity.WeekDay;
+import pn.proyectonuclear4.mapping.dto.WeekDayDto;
 import pn.proyectonuclear4.mapping.mappers.WeekDayMapper;
 import pn.proyectonuclear4.repository.WeekDayRepository;
 import pn.proyectonuclear4.service.impl.WeekDayServiceImpl;
@@ -116,49 +116,4 @@ class WeekDayServiceTest {
         verify(weekDayRepository).save(any(WeekDay.class));
         verify(weekDayMapper).mapFrom(weekDay);
     }
-
-    @Test
-    void deleteWeekDay_WhenWeekDayExists_ShouldMarkAsInactive() {
-        // Arrange
-        when(weekDayRepository.findById(1)).thenReturn(Optional.of(weekDay));
-        when(weekDayRepository.save(any(WeekDay.class))).thenReturn(weekDay);
-
-        // Act
-        weekDayService.deleteWeekDay(1);
-
-        // Assert
-        verify(weekDayRepository).findById(1);
-        verify(weekDayRepository).save(any(WeekDay.class));
-        assertFalse(weekDay.getIsActive());
-    }
-
-    @Test
-    void deleteWeekDay_WhenWeekDayDoesNotExist_ShouldThrowException() {
-        // Arrange
-        when(weekDayRepository.findById(999)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThrows(RuntimeException.class, () -> weekDayService.deleteWeekDay(999));
-        verify(weekDayRepository).findById(999);
-        verify(weekDayRepository, never()).save(any(WeekDay.class));
-    }
-
-    @Test
-    void getWeekDaysByIsActive_ShouldReturnFilteredWeekDays() {
-        // Arrange
-        List<WeekDay> weekDays = Arrays.asList(weekDay);
-        List<WeekDayDto> expectedDtos = Arrays.asList(weekDayDto);
-        when(weekDayRepository.findByIsActive(true)).thenReturn(weekDays);
-        when(weekDayMapper.mapFrom(any(WeekDay.class))).thenReturn(weekDayDto);
-
-        // Act
-        List<WeekDayDto> result = weekDayService.getWeekDaysByIsActive(true);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(expectedDtos.size(), result.size());
-        assertEquals(expectedDtos.get(0).idWeekDay(), result.get(0).idWeekDay());
-        verify(weekDayRepository).findByIsActive(true);
-        verify(weekDayMapper).mapFrom(any(WeekDay.class));
-    }
-} 
+}

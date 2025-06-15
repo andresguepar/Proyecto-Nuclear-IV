@@ -18,23 +18,26 @@ public class AddOnServiceServiceImpl implements AddOnServiceService {
     @Autowired
     private AddOnServiceRepository addOnServiceRepository;
 
+    @Autowired
+    private AddOnServiceMapper addOnServiceMapper;
+
     @Override
     public List<AddOnServiceDto> getAllAddOnServices() {
         List<AddOnService> addOnServices = addOnServiceRepository.findAll();
-        return AddOnServiceMapper.mapFrom(addOnServices);
+        return addOnServiceMapper.mapFrom(addOnServices);
     }
 
     @Override
     public Optional<AddOnServiceDto> getAddOnServiceById(int id) {
         Optional<AddOnService> addOnService = addOnServiceRepository.findById(id);
-        return addOnService.map(AddOnServiceMapper::mapFrom);
+        return addOnService.map(addOnServiceMapper::mapFrom);
     }
 
     @Override
     public AddOnServiceDto saveAddOnService(AddOnServiceDto addOnServiceDto) {
-        AddOnService addOnServiceEntity = AddOnServiceMapper.mapFrom(addOnServiceDto);
+        AddOnService addOnServiceEntity = addOnServiceMapper.mapFrom(addOnServiceDto);
         AddOnService savedAddOnService = addOnServiceRepository.save(addOnServiceEntity);
-        return AddOnServiceMapper.mapFrom(savedAddOnService);
+        return addOnServiceMapper.mapFrom(savedAddOnService);
     }
 
     @Override
@@ -48,13 +51,13 @@ public class AddOnServiceServiceImpl implements AddOnServiceService {
     @Override
     public List<AddOnServiceDto> getAddOnServicesByIsActive(Boolean isActive) {
         List<AddOnService> addOnServices = addOnServiceRepository.findByIsActive(isActive);
-        return AddOnServiceMapper.mapFrom(addOnServices);
+        return addOnServiceMapper.mapFrom(addOnServices);
     }
 
     @Override
     public List<AddOnServiceDto> getAddOnServicesByParkingLotId(int parkingLotId) {
         List<AddOnService> addOnServices = addOnServiceRepository.findByParkingLotAndIsActive(parkingLotId);
-        return AddOnServiceMapper.mapFrom(addOnServices);
+        return addOnServiceMapper.mapFrom(addOnServices);
     }
 
 }

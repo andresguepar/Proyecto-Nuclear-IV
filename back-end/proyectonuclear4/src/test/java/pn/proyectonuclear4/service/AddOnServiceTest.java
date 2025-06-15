@@ -6,11 +6,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pn.proyectonuclear4.mapping.dto.AddOnDto;
-import pn.proyectonuclear4.entity.AddOn;
-import pn.proyectonuclear4.mapping.mappers.AddOnMapper;
-import pn.proyectonuclear4.repository.AddOnRepository;
-import pn.proyectonuclear4.service.impl.AddOnServiceImpl;
+import pn.proyectonuclear4.entity.AddOnService;
+import pn.proyectonuclear4.entity.ParkingLot;
+import pn.proyectonuclear4.mapping.dto.AddOnServiceDto;
+import pn.proyectonuclear4.mapping.mappers.AddOnServiceMapper;
+import pn.proyectonuclear4.repository.AddOnServiceRepository;
+import pn.proyectonuclear4.service.impl.AddOnServiceServiceImpl;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,145 +25,180 @@ import static org.mockito.Mockito.*;
 class AddOnServiceTest {
 
     @Mock
-    private AddOnRepository addOnRepository;
+    private AddOnServiceRepository addOnServiceRepository;
 
     @Mock
-    private AddOnMapper addOnMapper;
+    private AddOnServiceMapper addOnServiceMapper;
 
     @InjectMocks
-    private AddOnServiceImpl addOnService;
+    private AddOnServiceServiceImpl addOnService;
 
-    private AddOn addOn;
-    private AddOnDto addOnDto;
+    private AddOnService addOnServiceEntity;
+    private AddOnServiceDto addOnServiceDto;
+    private ParkingLot parkingLot;
 
     @BeforeEach
     void setUp() {
-        addOn = AddOn.builder()
-                .idAddOn(1)
-                .name("Car Wash")
-                .description("Full car wash service")
+        parkingLot = ParkingLot.builder()
+                .idParkingLot(1)
+                .address("Test Address")
+                .phone("123456789")
+                .name("Test Parking Lot")
+                .nit("123456789")
+                .coordX("10.0")
+                .coordY("20.0")
                 .isActive(true)
                 .build();
 
-        addOnDto = new AddOnDto(
+        addOnServiceEntity = AddOnService.builder()
+                .idAddOnService(1)
+                .name("Car Wash")
+                .description("Full car wash service")
+                .price(50.0)
+                .isActive(true)
+                .parkingLot(parkingLot)
+                .build();
+
+        addOnServiceDto = new AddOnServiceDto(
             1,
             "Car Wash",
             "Full car wash service",
-            true
+            50.0,
+            true,
+            parkingLot
         );
     }
 
     @Test
-    void getAllAddOns_ShouldReturnListOfAddOns() {
+    void getAllAddOnServices_ShouldReturnListOfAddOnServices() {
         // Arrange
-        List<AddOn> addOns = Arrays.asList(addOn);
-        List<AddOnDto> expectedDtos = Arrays.asList(addOnDto);
-        when(addOnRepository.findAll()).thenReturn(addOns);
-        when(addOnMapper.mapFrom(any(AddOn.class))).thenReturn(addOnDto);
+        List<AddOnService> addOnServices = Arrays.asList(addOnServiceEntity);
+        List<AddOnServiceDto> expectedDtos = Arrays.asList(addOnServiceDto);
+        when(addOnServiceRepository.findAll()).thenReturn(addOnServices);
+        when(addOnServiceMapper.mapFrom(addOnServices)).thenReturn(expectedDtos);
 
         // Act
-        List<AddOnDto> result = addOnService.getAllAddOns();
+        List<AddOnServiceDto> result = addOnService.getAllAddOnServices();
 
         // Assert
         assertNotNull(result);
         assertEquals(expectedDtos.size(), result.size());
-        assertEquals(expectedDtos.get(0).idAddOn(), result.get(0).idAddOn());
-        verify(addOnRepository).findAll();
-        verify(addOnMapper).mapFrom(any(AddOn.class));
+        assertEquals(expectedDtos.get(0).idAddOnService(), result.get(0).idAddOnService());
+        verify(addOnServiceRepository).findAll();
+        verify(addOnServiceMapper).mapFrom(addOnServices);
     }
 
     @Test
-    void getAddOnById_WhenAddOnExists_ShouldReturnAddOn() {
+    void getAddOnServiceById_WhenAddOnServiceExists_ShouldReturnAddOnService() {
         // Arrange
-        when(addOnRepository.findById(1)).thenReturn(Optional.of(addOn));
-        when(addOnMapper.mapFrom(addOn)).thenReturn(addOnDto);
+        when(addOnServiceRepository.findById(1)).thenReturn(Optional.of(addOnServiceEntity));
+        when(addOnServiceMapper.mapFrom(addOnServiceEntity)).thenReturn(addOnServiceDto);
 
         // Act
-        Optional<AddOnDto> result = addOnService.getAddOnById(1);
+        Optional<AddOnServiceDto> result = addOnService.getAddOnServiceById(1);
 
         // Assert
         assertTrue(result.isPresent());
-        assertEquals(addOnDto.idAddOn(), result.get().idAddOn());
-        assertEquals(addOnDto.name(), result.get().name());
-        verify(addOnRepository).findById(1);
-        verify(addOnMapper).mapFrom(addOn);
+        assertEquals(addOnServiceDto.idAddOnService(), result.get().idAddOnService());
+        assertEquals(addOnServiceDto.name(), result.get().name());
+        verify(addOnServiceRepository).findById(1);
+        verify(addOnServiceMapper).mapFrom(addOnServiceEntity);
     }
 
     @Test
-    void getAddOnById_WhenAddOnDoesNotExist_ShouldReturnEmpty() {
+    void getAddOnServiceById_WhenAddOnServiceDoesNotExist_ShouldReturnEmpty() {
         // Arrange
-        when(addOnRepository.findById(999)).thenReturn(Optional.empty());
+        when(addOnServiceRepository.findById(999)).thenReturn(Optional.empty());
 
         // Act
-        Optional<AddOnDto> result = addOnService.getAddOnById(999);
+        Optional<AddOnServiceDto> result = addOnService.getAddOnServiceById(999);
 
         // Assert
         assertTrue(result.isEmpty());
-        verify(addOnRepository).findById(999);
-        verify(addOnMapper, never()).mapFrom(any(AddOn.class));
+        verify(addOnServiceRepository).findById(999);
+        verify(addOnServiceMapper, never()).mapFrom(any(AddOnService.class));
     }
 
     @Test
-    void saveAddOn_ShouldReturnSavedAddOn() {
+    void saveAddOnService_ShouldReturnSavedAddOnService() {
         // Arrange
-        when(addOnMapper.mapFrom(any(AddOnDto.class))).thenReturn(addOn);
-        when(addOnRepository.save(any(AddOn.class))).thenReturn(addOn);
-        when(addOnMapper.mapFrom(any(AddOn.class))).thenReturn(addOnDto);
+        when(addOnServiceMapper.mapFrom(addOnServiceDto)).thenReturn(addOnServiceEntity);
+        when(addOnServiceRepository.save(addOnServiceEntity)).thenReturn(addOnServiceEntity);
+        when(addOnServiceMapper.mapFrom(addOnServiceEntity)).thenReturn(addOnServiceDto);
 
         // Act
-        AddOnDto result = addOnService.saveAddOn(addOnDto);
+        AddOnServiceDto result = addOnService.saveAddOnService(addOnServiceDto);
 
         // Assert
         assertNotNull(result);
-        assertEquals(addOnDto.idAddOn(), result.idAddOn());
-        assertEquals(addOnDto.name(), result.name());
-        verify(addOnMapper).mapFrom(addOnDto);
-        verify(addOnRepository).save(any(AddOn.class));
-        verify(addOnMapper).mapFrom(addOn);
+        assertEquals(addOnServiceDto.idAddOnService(), result.idAddOnService());
+        assertEquals(addOnServiceDto.name(), result.name());
+        verify(addOnServiceMapper).mapFrom(addOnServiceDto);
+        verify(addOnServiceRepository).save(addOnServiceEntity);
+        verify(addOnServiceMapper).mapFrom(addOnServiceEntity);
     }
 
     @Test
-    void deleteAddOn_WhenAddOnExists_ShouldMarkAsInactive() {
+    void deleteAddOnService_WhenAddOnServiceExists_ShouldMarkAsInactive() {
         // Arrange
-        when(addOnRepository.findById(1)).thenReturn(Optional.of(addOn));
-        when(addOnRepository.save(any(AddOn.class))).thenReturn(addOn);
+        when(addOnServiceRepository.findById(1)).thenReturn(Optional.of(addOnServiceEntity));
+        when(addOnServiceRepository.save(addOnServiceEntity)).thenReturn(addOnServiceEntity);
 
         // Act
-        addOnService.deleteAddOn(1);
+        addOnService.deleteAddOnService(1);
 
         // Assert
-        verify(addOnRepository).findById(1);
-        verify(addOnRepository).save(any(AddOn.class));
-        assertFalse(addOn.getIsActive());
+        verify(addOnServiceRepository).findById(1);
+        verify(addOnServiceRepository).save(addOnServiceEntity);
+        assertFalse(addOnServiceEntity.getIsActive());
     }
 
     @Test
-    void deleteAddOn_WhenAddOnDoesNotExist_ShouldThrowException() {
+    void deleteAddOnService_WhenAddOnServiceDoesNotExist_ShouldThrowException() {
         // Arrange
-        when(addOnRepository.findById(999)).thenReturn(Optional.empty());
+        when(addOnServiceRepository.findById(999)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(RuntimeException.class, () -> addOnService.deleteAddOn(999));
-        verify(addOnRepository).findById(999);
-        verify(addOnRepository, never()).save(any(AddOn.class));
+        assertThrows(RuntimeException.class, () -> addOnService.deleteAddOnService(999));
+        verify(addOnServiceRepository).findById(999);
+        verify(addOnServiceRepository, never()).save(any(AddOnService.class));
     }
 
     @Test
-    void getAddOnsByIsActive_ShouldReturnFilteredAddOns() {
+    void getAddOnServicesByIsActive_ShouldReturnFilteredAddOnServices() {
         // Arrange
-        List<AddOn> addOns = Arrays.asList(addOn);
-        List<AddOnDto> expectedDtos = Arrays.asList(addOnDto);
-        when(addOnRepository.findByIsActive(true)).thenReturn(addOns);
-        when(addOnMapper.mapFrom(any(AddOn.class))).thenReturn(addOnDto);
+        List<AddOnService> addOnServices = Arrays.asList(addOnServiceEntity);
+        List<AddOnServiceDto> expectedDtos = Arrays.asList(addOnServiceDto);
+        when(addOnServiceRepository.findByIsActive(true)).thenReturn(addOnServices);
+        when(addOnServiceMapper.mapFrom(addOnServices)).thenReturn(expectedDtos);
 
         // Act
-        List<AddOnDto> result = addOnService.getAddOnsByIsActive(true);
+        List<AddOnServiceDto> result = addOnService.getAddOnServicesByIsActive(true);
 
         // Assert
         assertNotNull(result);
         assertEquals(expectedDtos.size(), result.size());
-        assertEquals(expectedDtos.get(0).idAddOn(), result.get(0).idAddOn());
-        verify(addOnRepository).findByIsActive(true);
-        verify(addOnMapper).mapFrom(any(AddOn.class));
+        assertEquals(expectedDtos.get(0).idAddOnService(), result.get(0).idAddOnService());
+        verify(addOnServiceRepository).findByIsActive(true);
+        verify(addOnServiceMapper).mapFrom(addOnServices);
     }
-} 
+
+    @Test
+    void getAddOnServicesByParkingLotId_ShouldReturnFilteredAddOnServices() {
+        // Arrange
+        List<AddOnService> addOnServices = Arrays.asList(addOnServiceEntity);
+        List<AddOnServiceDto> expectedDtos = Arrays.asList(addOnServiceDto);
+        when(addOnServiceRepository.findByParkingLotAndIsActive(1)).thenReturn(addOnServices);
+        when(addOnServiceMapper.mapFrom(addOnServices)).thenReturn(expectedDtos);
+
+        // Act
+        List<AddOnServiceDto> result = addOnService.getAddOnServicesByParkingLotId(1);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(expectedDtos.size(), result.size());
+        assertEquals(expectedDtos.get(0).idAddOnService(), result.get(0).idAddOnService());
+        verify(addOnServiceRepository).findByParkingLotAndIsActive(1);
+        verify(addOnServiceMapper).mapFrom(addOnServices);
+    }
+}

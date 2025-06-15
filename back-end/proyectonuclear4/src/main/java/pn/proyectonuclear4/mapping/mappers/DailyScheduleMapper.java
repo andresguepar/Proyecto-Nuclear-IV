@@ -2,25 +2,32 @@ package pn.proyectonuclear4.mapping.mappers;
 
 import pn.proyectonuclear4.entity.DailySchedule;
 import pn.proyectonuclear4.mapping.dto.DailyScheduleDto;
-import lombok.Builder;
+import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Builder
+@Component
 public class DailyScheduleMapper {
-    public static DailyScheduleDto mapFrom(DailySchedule source) {
-        return DailyScheduleDto.builder()
-                .idDailySchedule(source.getIdDailySchedule())
-                .schedule(source.getSchedule())
-                .startTime(source.getStartTime())
-                .endTime(source.getEndTime())
-                .weekDay(source.getWeekDay())
-                .isActive(source.getIsActive())
-                .build();
+    public DailyScheduleDto mapFrom(DailySchedule source) {
+        if (source == null) {
+            return null;
+        }
+        return new DailyScheduleDto(
+            source.getIdDailySchedule(),
+            source.getSchedule(),
+            source.getStartTime(),
+            source.getEndTime(),
+            source.getWeekDay(),
+            source.getIsActive()
+        );
     }
 
-    public static DailySchedule mapFrom(DailyScheduleDto source) {
+    public DailySchedule mapFrom(DailyScheduleDto source) {
+        if (source == null) {
+            return null;
+        }
         return DailySchedule.builder()
                 .idDailySchedule(source.idDailySchedule())
                 .schedule(source.schedule())
@@ -31,11 +38,21 @@ public class DailyScheduleMapper {
                 .build();
     }
 
-    public static List<DailyScheduleDto> mapFrom(List<DailySchedule> source) {
-        return source.stream().map(DailyScheduleMapper::mapFrom).collect(Collectors.toList());
+    public List<DailyScheduleDto> mapFrom(List<DailySchedule> source) {
+        if (source == null) {
+            return Collections.emptyList();
+        }
+        return source.stream()
+                .map(this::mapFrom)
+                .collect(Collectors.toList());
     }
 
-    public static List<DailySchedule> mapToEntities(List<DailyScheduleDto> source) {
-        return source.stream().map(DailyScheduleMapper::mapFrom).collect(Collectors.toList());
+    public List<DailySchedule> mapToEntities(List<DailyScheduleDto> source) {
+        if (source == null) {
+            return Collections.emptyList();
+        }
+        return source.stream()
+                .map(this::mapFrom)
+                .collect(Collectors.toList());
     }
 }

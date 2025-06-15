@@ -24,7 +24,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class StandardReservationServiceImplTest {
@@ -133,7 +134,7 @@ class StandardReservationServiceImplTest {
     void deleteStandardReservation_WhenNotExists_ShouldThrowException() {
         when(standardReservationRepository.findById(999)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> 
+        assertThrows(ResourceNotFoundException.class, () ->
             standardReservationService.deleteStandardReservation(999)
         );
 
@@ -201,4 +202,4 @@ class StandardReservationServiceImplTest {
 
         verify(standardReservationRepository).findById(999);
     }
-} 
+}

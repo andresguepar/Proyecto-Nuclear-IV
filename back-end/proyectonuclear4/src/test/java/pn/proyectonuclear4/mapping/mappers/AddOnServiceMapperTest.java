@@ -2,7 +2,8 @@ package pn.proyectonuclear4.mapping.mappers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pn.proyectonuclear4.entity.*;
+import pn.proyectonuclear4.entity.AddOnService;
+import pn.proyectonuclear4.entity.ParkingLot;
 import pn.proyectonuclear4.mapping.dto.AddOnServiceDto;
 
 import java.util.Arrays;
@@ -12,11 +13,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AddOnServiceMapperTest {
 
+    private AddOnServiceMapper mapper;
     private AddOnService addOnService;
     private ParkingLot parkingLot;
 
     @BeforeEach
     void setUp() {
+        mapper = new AddOnServiceMapper();
+        
         // Create related entities
         parkingLot = ParkingLot.builder()
                 .idParkingLot(1)
@@ -38,7 +42,7 @@ class AddOnServiceMapperTest {
     @Test
     void mapFrom_EntityToDto_ShouldMapAllFields() {
         // Act
-        AddOnServiceDto dto = AddOnServiceMapper.mapFrom(addOnService);
+        AddOnServiceDto dto = mapper.mapFrom(addOnService);
 
         // Assert
         assertNotNull(dto);
@@ -53,10 +57,10 @@ class AddOnServiceMapperTest {
     @Test
     void mapFrom_DtoToEntity_ShouldMapAllFields() {
         // Arrange
-        AddOnServiceDto dto = AddOnServiceMapper.mapFrom(addOnService);
+        AddOnServiceDto dto = mapper.mapFrom(addOnService);
 
         // Act
-        AddOnService entity = AddOnServiceMapper.mapFrom(dto);
+        AddOnService entity = mapper.mapFrom(dto);
 
         // Assert
         assertNotNull(entity);
@@ -83,7 +87,7 @@ class AddOnServiceMapperTest {
         List<AddOnService> entities = Arrays.asList(addOnService, addOnService2);
 
         // Act
-        List<AddOnServiceDto> dtos = AddOnServiceMapper.mapFrom(entities);
+        List<AddOnServiceDto> dtos = mapper.mapFrom(entities);
 
         // Assert
         assertNotNull(dtos);
@@ -95,7 +99,7 @@ class AddOnServiceMapperTest {
     @Test
     void mapToEntities_DtoListToEntityList_ShouldMapAllDtos() {
         // Arrange
-        AddOnServiceDto dto1 = AddOnServiceMapper.mapFrom(addOnService);
+        AddOnServiceDto dto1 = mapper.mapFrom(addOnService);
         AddOnServiceDto dto2 = new AddOnServiceDto(
                 2,
                 "Valet Parking",
@@ -108,7 +112,7 @@ class AddOnServiceMapperTest {
         List<AddOnServiceDto> dtos = Arrays.asList(dto1, dto2);
 
         // Act
-        List<AddOnService> entities = AddOnServiceMapper.mapToEntities(dtos);
+        List<AddOnService> entities = mapper.mapToEntities(dtos);
 
         // Assert
         assertNotNull(entities);
@@ -120,7 +124,7 @@ class AddOnServiceMapperTest {
     @Test
     void mapFrom_NullEntity_ShouldReturnNull() {
         // Act
-        AddOnServiceDto dto = AddOnServiceMapper.mapFrom((AddOnService) null);
+        AddOnServiceDto dto = mapper.mapFrom((AddOnService) null);
 
         // Assert
         assertNull(dto);
@@ -129,7 +133,7 @@ class AddOnServiceMapperTest {
     @Test
     void mapFrom_NullDto_ShouldReturnNull() {
         // Act
-        AddOnService entity = AddOnServiceMapper.mapFrom((AddOnServiceDto) null);
+        AddOnService entity = mapper.mapFrom((AddOnServiceDto) null);
 
         // Assert
         assertNull(entity);
@@ -138,7 +142,7 @@ class AddOnServiceMapperTest {
     @Test
     void mapFrom_NullEntityList_ShouldReturnEmptyList() {
         // Act
-        List<AddOnServiceDto> dtos = AddOnServiceMapper.mapFrom((List<AddOnService>) null);
+        List<AddOnServiceDto> dtos = mapper.mapFrom((List<AddOnService>) null);
 
         // Assert
         assertNotNull(dtos);
@@ -148,10 +152,10 @@ class AddOnServiceMapperTest {
     @Test
     void mapToEntities_NullDtoList_ShouldReturnEmptyList() {
         // Act
-        List<AddOnService> entities = AddOnServiceMapper.mapToEntities(null);
+        List<AddOnService> entities = mapper.mapToEntities(null);
 
         // Assert
         assertNotNull(entities);
         assertTrue(entities.isEmpty());
     }
-} 
+}

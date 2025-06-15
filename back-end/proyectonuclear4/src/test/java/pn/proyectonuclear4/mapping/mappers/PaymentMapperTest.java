@@ -2,7 +2,9 @@ package pn.proyectonuclear4.mapping.mappers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pn.proyectonuclear4.entity.*;
+import pn.proyectonuclear4.entity.Fee;
+import pn.proyectonuclear4.entity.Payment;
+import pn.proyectonuclear4.entity.PaymentMethod;
 import pn.proyectonuclear4.mapping.dto.PaymentDto;
 
 import java.time.LocalDateTime;
@@ -158,4 +160,4 @@ class PaymentMapperTest {
         assertNotNull(entities);
         assertTrue(entities.isEmpty());
     }
-} 
+}
