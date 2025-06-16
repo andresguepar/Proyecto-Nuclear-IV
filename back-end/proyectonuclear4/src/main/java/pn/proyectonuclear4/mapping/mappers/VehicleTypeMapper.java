@@ -19,9 +19,9 @@ public class VehicleTypeMapper {
 
     public static VehicleType mapFrom(VehicleTypeDto source) {
         return VehicleType.builder()
-                .idVehicleType(source.idVehicleType())
-                .name(source.name())
-                .isActive(source.isActive())
+                .idVehicleType(source.getIdVehicleType())
+                .name(source.getName())
+                .isActive(source.getIsActive())
                 .build();
     }
 

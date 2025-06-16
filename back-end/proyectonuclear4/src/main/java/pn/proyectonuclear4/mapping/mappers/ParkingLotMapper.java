@@ -25,15 +25,15 @@ public class ParkingLotMapper {
 
     public static ParkingLot mapFrom(ParkingLotDto source) {
         return ParkingLot.builder()
-                .idParkingLot(source.idParkingLot())
-                .admin(source.admin())
-                .address(source.address())
-                .coordX(source.coordX())
-                .coordY(source.coordY())
-                .name(source.name())
-                .nit(source.nit())
-                .phone(source.phone())
-                .isActive(source.isActive())
+                .idParkingLot(source.getIdParkingLot())
+                .admin(source.getAdmin())
+                .address(source.getAddress())
+                .coordX(source.getCoordX())
+                .coordY(source.getCoordY())
+                .name(source.getName())
+                .nit(source.getNit())
+                .phone(source.getPhone())
+                .isActive(source.getIsActive())
                 .build();
     }
 

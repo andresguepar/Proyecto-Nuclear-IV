@@ -19,7 +19,7 @@ public class AddOnServiceFee {
 
     private Double total;
 
-    @Column(columnDefinition = "json")
+    @Column(name = "add_on_services", columnDefinition = "json")
     private String addOnServices;
 
     private Boolean isActive;
@@ -27,4 +27,4 @@ public class AddOnServiceFee {
     @ManyToOne
     @JoinColumn(name = "standard_reservation_id")
     private StandardReservation standardReservation;
-} 
+}

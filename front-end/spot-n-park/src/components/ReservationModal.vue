@@ -49,6 +49,13 @@
           </div>
         </div>
       </div>
+      <div v-if="showLoginPopup" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-60">
+        <div class="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
+          <p class="mb-4 text-lg font-semibold text-gray-800">Necesitas iniciar sesión para reservar.</p>
+          <BaseButton color="info" label="Iniciar sesión" @click="() => router.push('/login')" />
+          <BaseButton color="danger" label="Cerrar" class="mt-2" @click="() => showLoginPopup = false" />
+        </div>
+      </div>
     </div>
   </transition>
 </template>
@@ -59,6 +66,9 @@ import BaseButton from '@/components/BaseButton.vue'
 import { slotsService } from '@/services/slotsService'
 import { parkingLotsService } from '@/services/parkingLotsService'
 import { reservationsService } from '@/services/reservationsService'
+import { addOnServiceFeesService } from '@/services/addOnServiceFeesService'
+import { useAuthStore } from '@/stores/auth.js'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   show: Boolean,
@@ -74,6 +84,8 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:show', 'reserved', 'add-on-services-change'])
 
+const authStore = useAuthStore()
+const router = useRouter()
 const selectedSlotId = ref('')
 const availableSlots = ref([])
 const lotPhone = ref('')
@@ -83,6 +95,7 @@ const formData = ref({
   plate: '',
   vehicleTypeName: ''
 })
+const showLoginPopup = ref(false)
 
 watch(() => props.show, async (val) => {
   if (val && props.lot && props.vehicleTypeId) {
@@ -114,20 +127,83 @@ watch(selectedAddOnsProxy, (val) => {
 })
 
 const handleReserve = async () => {
+  if (!authStore.isAuthenticated()) {
+    showLoginPopup.value = true
+    return
+  }
   if (!availableSlots.value.length) return
   const slot = availableSlots.value[0]
-  await slotsService.updateSlot(slot.idSlot, { ...slot, isAvailable: false })
+  // Log detallado para depuración
+  console.log('Slot:', slot)
+  console.log('slot.parkingLot:', slot.parkingLot)
+  console.log('slot.vehicleType:', slot.vehicleType)
+  // Validación y log para evitar error 500
+  const parkingLotId = slot.parkingLot?.id || slot.parkingLot?.idParkingLot
+  const vehicleTypeId = slot.vehicleType?.id || slot.vehicleType?.idVehicleType
+  if (!slot || !slot.idSlot || !slot.name || !parkingLotId || !vehicleTypeId) {
+    console.error('Slot incompleto para updateSlot:', slot)
+    alert('Error: El slot seleccionado no tiene toda la información necesaria. Contacte al administrador.')
+    return
+  }
+  console.log('Enviando slot a updateSlot:', slot)
+  await slotsService.updateSlot(slot.idSlot, {
+    ...slot,
+    isAvailable: false,
+    parkingLot: { id: parkingLotId },
+    vehicleType: { id: vehicleTypeId }
+  })
+  // 1. Guardar la reservación estándar
+  const now = new Date();
+  const checkInTimestamp = new Date(formData.value.startDate + 'T' + formData.value.startTime);
+  const scheduledDateTime = new Date(formData.value.startDate + 'T' + formData.value.startTime);
+  const userId = authStore.user && (authStore.user.idUser || authStore.user.id || authStore.user.userId);
+  if (!userId) {
+    console.error('Objeto user en authStore:', authStore.user);
+    alert('No se pudo obtener el usuario autenticado. Intenta cerrar sesión y volver a iniciar.');
+    return;
+  }
   const reservation = {
     parkingLot: { idParkingLot: props.lot.id },
     slot: { idSlot: slot.idSlot },
-    startDate: formData.value.startDate,
-    startTime: formData.value.startTime,
+    checkIn: checkInTimestamp.toISOString(),
+    reservationDate: now.toISOString(),
+    scheduledDateTime: scheduledDateTime.toISOString(),
     plate: formData.value.plate,
     vehicleType: { idVehicleType: props.vehicleTypeId },
-    addOnServices: selectedAddOnsProxy.value.map(s => ({ idFee: s.idFee })),
+    statusReservation: { idStatusReservation: 1 }, // 1 = pendiente
+    user: { idUser: userId },
     status: 'ACTIVE',
+    startDate: formData.value.startDate, // opcional, por compatibilidad
+    startTime: formData.value.startTime  // opcional, por compatibilidad
   }
-  await reservationsService.createStandardReservation(reservation)
+  let reservationResponse = null;
+  try {
+    reservationResponse = await reservationsService.createStandardReservation(reservation)
+  } catch (error) {
+    console.error('Error al guardar la reserva:', error)
+    alert('Ocurrió un error al guardar la reserva. Intenta de nuevo más tarde.')
+    return
+  }
+  // 2. Guardar add_on_services_fees si hay servicios seleccionados
+  if (selectedAddOnsProxy.value.length > 0 && reservationResponse && reservationResponse.idStandardReservation) {
+    try {
+      const addOnServiceFeeData = {
+        total: selectedAddOnsProxy.value.reduce((acc, s) => acc + (s.price || 0), 0),
+        addOnServices: JSON.stringify(selectedAddOnsProxy.value.map(s => ({
+          idAddOnService: s.id,
+          name: s.name,
+          price: s.price
+        }))),
+        isActive: true,
+        standardReservation: reservationResponse
+      }
+      console.log('Payload AddOnServiceFee:', addOnServiceFeeData)
+      await addOnServiceFeesService.createAddOnServiceFee(addOnServiceFeeData)
+    } catch (error) {
+      console.error('Error al guardar servicios adicionales:', error)
+      alert('La reserva fue guardada, pero ocurrió un error al guardar los servicios adicionales.')
+    }
+  }
   emit('reserved')
   emit('update:show', false)
 }

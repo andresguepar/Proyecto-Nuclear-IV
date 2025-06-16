@@ -1,17 +1,18 @@
 package pn.proyectonuclear4.mapping.dto;
 
 import lombok.Builder;
+import lombok.Data;
 import pn.proyectonuclear4.entity.Role;
 
+@Data
 @Builder
-public record UserDto(
-        int idUser,
-        Role role,
-        String username,
-        String password,
-        String email,
-        String identification,
-        String phone,
-        Boolean isActive
-) {
+public class UserDto {
+    private int idUser;
+    private Role role;
+    private String username;
+    private String password;
+    private String email;
+    private String identification;
+    private String phone;
+    private Boolean isActive;
 }

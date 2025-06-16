@@ -23,13 +23,14 @@ const router = useRouter()
 
 const submit = async () => {
   error.value = ''
-  const success = await authStore.login(form.login, form.pass)
-  if (success) {
+  const result = await authStore.login(form.login, form.pass)
+  if (result === true) {
     console.log('Login successful, redirecting...')
-    // Recargar la página después del login exitoso
     window.location.href = '/'
+  } else if (result === 'invalid_credentials') {
+    error.value = 'Usuario o contraseña incorrectos.'
   } else {
-    error.value = 'Credenciales incorrectas.'
+    error.value = 'Error al iniciar sesión. Intenta de nuevo más tarde.'
   }
 }
 
@@ -79,6 +80,10 @@ const goHome = () => {
           </div>
           <div class="w-full flex justify-end mt-2">
             <router-link to="/register" class="text-blue-600 hover:underline text-sm font-medium">¿Aún no estás registrado? Regístrate aquí</router-link>
+          </div>
+
+          <div v-if="error" class="w-full mb-4 p-2 bg-red-100 text-red-700 rounded text-center">
+            {{ error }}
           </div>
 
           <template #footer>

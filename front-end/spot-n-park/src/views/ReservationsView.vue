@@ -21,6 +21,7 @@
           :reservation="reservation"
           @edit="handleEdit"
           @cancel="handleCancel"
+          @confirm="handleConfirm"
         />
       </div>
 
@@ -61,16 +62,23 @@ import BaseButton from '@/components/BaseButton.vue'
 import ReservationCard from '@/components/ReservationCard.vue'
 import StandardServiceForm from '@/components/StandardServiceForm.vue'
 import axios from 'axios'
+import { useAuthStore } from '@/stores/auth.js'
 
 const router = useRouter()
 const reservations = ref([])
 const showEditReservationModal = ref(false)
 const showCancelModal = ref(false)
 const selectedReservation = ref(null)
+const authStore = useAuthStore()
 
 const fetchReservations = async () => {
   try {
-    const response = await axios.get('http://localhost:8080/standard-reservations/get')
+    const userId = authStore.user && (authStore.user.idUser || authStore.user.id || authStore.user.userId)
+    if (!userId) {
+      reservations.value = []
+      return
+    }
+    const response = await axios.get(`http://localhost:8080/standard-reservations/user/${userId}`)
     reservations.value = response.data.map(reservation => ({
       id: reservation.idStandardReservation,
       parkingName: reservation.slot.parkingLot.name,
@@ -78,9 +86,16 @@ const fetchReservations = async () => {
       date: new Date(reservation.scheduledDateTime).toLocaleDateString(),
       time: new Date(reservation.scheduledDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       pricePerHour: reservation.slot.parkingLot.pricePerHour,
-      slot: reservation.slot.number,
-      status: reservation.statusReservation.name,
-      plate: reservation.plate
+      slot: reservation.slot.name || reservation.slot.slotNumber || '',
+      plate: reservation.plate,
+      hours: reservation.slot.parkingLot.hours || '',
+      // Si tienes campos de horario más detallados, agrégalos aquí
+      startDate: reservation.startDate || '',
+      startTime: reservation.startTime || '',
+      endTime: reservation.endTime || '',
+      phone: reservation.slot.parkingLot.phone || '',
+      vehicleType: reservation.vehicleType || reservation.vehicleTypeName || '',
+      status: reservation.statusReservation.name
     }))
   } catch (error) {
     console.error('Error fetching reservations:', error)
@@ -127,7 +142,19 @@ const handleFormUpdate = async (formData) => {
   }
 }
 
+const handleConfirm = async (reservation) => {
+  try {
+    // Cambia el estado a 'CONFIRMED' (ajusta el nombre según tu backend)
+    await axios.put(`http://localhost:8080/standard-reservations/update-status/${reservation.id}`, {
+      status: 'CONFIRMED'
+    })
+    await fetchReservations()
+  } catch (error) {
+    console.error('Error confirming reservation:', error)
+  }
+}
+
 onMounted(() => {
   fetchReservations()
 })
-</script> 
+</script>

@@ -23,13 +23,13 @@ public class StandardFeeMapper {
 
     public static StandardFee mapFrom(StandardFeeDto source) {
         return StandardFee.builder()
-                .idStandardFee(source.idStandardFee())
-                .vehicleType(source.vehicleType())
-                .parkingLot(source.parkingLot())
-                .priceForHours(source.priceForHours())
-                .isActivePriceFortTwelveHours(source.isActivePriceFortTwelveHours())
-                .priceForTwelveHours(source.priceForTwelveHours())
-                .isActive(source.isActive())
+                .idStandardFee(source.getIdStandardFee())
+                .vehicleType(source.getVehicleType())
+                .parkingLot(source.getParkingLot())
+                .priceForHours(source.getPriceForHours())
+                .isActivePriceFortTwelveHours(source.getIsActivePriceFortTwelveHours())
+                .priceForTwelveHours(source.getPriceForTwelveHours())
+                .isActive(source.getIsActive())
                 .build();
     }
 

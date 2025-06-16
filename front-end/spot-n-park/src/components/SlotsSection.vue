@@ -90,6 +90,15 @@
               required
             />
           </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-2">Disponible</label>
+            <input
+              v-model="form.isAvailable"
+              type="checkbox"
+              class="mr-2"
+            />
+            <span>{{ form.isAvailable ? 'Sí' : 'No' }}</span>
+          </div>
           <div class="flex justify-end">
             <button
               type="submit"

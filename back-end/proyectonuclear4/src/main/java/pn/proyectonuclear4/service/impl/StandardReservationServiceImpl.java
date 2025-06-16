@@ -3,25 +3,18 @@ package pn.proyectonuclear4.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pn.proyectonuclear4.entity.StandardReservation;
-import pn.proyectonuclear4.entity.User;
-import pn.proyectonuclear4.entity.Slot;
 import pn.proyectonuclear4.entity.StatusReservation;
 import pn.proyectonuclear4.exception.ResourceNotFoundException;
 import pn.proyectonuclear4.mapping.dto.StandardReservationDto;
-import pn.proyectonuclear4.mapping.mappers.StandardFeeMapper;
 import pn.proyectonuclear4.mapping.mappers.StandardReservationMapper;
 import pn.proyectonuclear4.repository.StandardReservationRepository;
 import pn.proyectonuclear4.repository.UserRepository;
-import pn.proyectonuclear4.repository.SlotRepository;
 import pn.proyectonuclear4.repository.StatusReservationRepository;
 import pn.proyectonuclear4.service.StandardReservationService;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 public class StandardReservationServiceImpl implements StandardReservationService {

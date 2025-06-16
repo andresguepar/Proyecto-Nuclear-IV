@@ -25,6 +25,7 @@ const asideLgCloseClick = (event) => {
 <template>
   <AsideMenuLayer
     :menu="menu"
+    v-bind="$attrs"
     :class="[
       isAsideMobileExpanded ? 'left-0' : '-left-60 lg:left-0',
       { 'lg:hidden xl:flex': !isAsideLgActive },

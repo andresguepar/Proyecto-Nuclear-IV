@@ -24,14 +24,14 @@ public class UserMapper {
 
     public static User mapFrom(UserDto source) {
         return User.builder()
-                .idUser(source.idUser())
-                .role(source.role())
-                .username(source.username())
-                .password(source.password())
-                .email(source.email())
-                .identification(source.identification())
-                .phone(source.phone())
-                .isActive(source.isActive())
+                .idUser(source.getIdUser())
+                .role(source.getRole())
+                .username(source.getUsername())
+                .password(source.getPassword())
+                .email(source.getEmail())
+                .identification(source.getIdentification())
+                .phone(source.getPhone())
+                .isActive(source.getIsActive())
                 .build();
     }
 

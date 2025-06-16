@@ -31,10 +31,21 @@ axios.interceptors.response.use(
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
+
+  // Restaurar usuario desde localStorage si existe
+  const storedUser = localStorage.getItem('user')
+  if (storedUser) {
+    try {
+      user.value = JSON.parse(storedUser)
+    } catch (e) {
+      user.value = null
+    }
+  }
   const role = ref(localStorage.getItem('role') || null)
 
   function setAuth(userData) {
     user.value = userData
+    localStorage.setItem('user', JSON.stringify(userData))
     role.value = userData?.role?.name || null
     localStorage.setItem('role', role.value)
     console.log('Auth data set:', { user: user.value, role: role.value })
@@ -42,6 +53,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   function clearAuth() {
     user.value = null
+    localStorage.removeItem('user')
     role.value = null
     localStorage.removeItem('role')
   }
@@ -52,7 +64,7 @@ export const useAuthStore = defineStore('auth', () => {
         params: { username, password }
       })
       console.log('Login response:', response.data)
-      
+
       if (response.data && response.data.role) {
         setAuth(response.data)
         return true
@@ -64,6 +76,10 @@ export const useAuthStore = defineStore('auth', () => {
     } catch (e) {
       console.error('Login error:', e)
       clearAuth()
+      // Mostrar mensaje específico si es error 401 o 400
+      if (e.response && (e.response.status === 401 || e.response.status === 400)) {
+        return 'invalid_credentials'
+      }
       return false
     }
   }

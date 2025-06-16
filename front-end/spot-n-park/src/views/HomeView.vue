@@ -187,6 +187,7 @@ import { slotsService } from '@/services/slotsService'
 import { standardFeesService } from '@/services/standardFeesService'
 import { monthlyFeesService } from '@/services/monthlyFeesService'
 import { schedulesService } from '@/services/schedulesService.js'
+import { addOnServicesService } from '@/services/addOnServicesService'
 
 const activeTab = ref('standart')
 const parkingLots = ref([])
@@ -697,6 +698,8 @@ const loadGoogleMapsAPI = () => {
 
 onMounted(async () => {
   try {
+    // Cargar servicios adicionales antes de cualquier filtro
+    allAddOnServices.value = await addOnServicesService.getAllAddOnServices()
     console.log('Component mounted, starting initialization...')
     // Cargar la API de Google Maps primero
     await loadGoogleMapsAPI()
