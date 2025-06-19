@@ -7,6 +7,7 @@ export const monthlyFeesService = {
     const response = await axios.get(`${API_URL}/get`)
     return response.data.map(fee => ({
       ...fee,
+      id: fee.idMonthlyFee,
       status: fee.isActive ? 'active' : 'inactive',
       parking_lot_name: fee.parkingLot?.name,
       vehicle_type_name: fee.vehicleType?.name
