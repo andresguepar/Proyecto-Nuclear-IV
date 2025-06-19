@@ -108,7 +108,7 @@ const createUser = async () => {
   try {
     await usersService.createUser({
       idUser: undefined,
-      name: newUser.value.username,
+      username: newUser.value.username, // Usar username
       email: newUser.value.email,
       password: newUser.value.password,
       phone: newUser.value.phone,

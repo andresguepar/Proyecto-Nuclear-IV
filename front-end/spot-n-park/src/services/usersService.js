@@ -21,7 +21,7 @@ export const usersService = {
   async createUser(userData) {
     const transformedData = {
       idUser: userData.idUser,
-      name: userData.name,
+      username: userData.username,
       email: userData.email,
       password: userData.password,
       phone: userData.phone,
@@ -37,7 +37,7 @@ export const usersService = {
   async updateUser(id, userData) {
     const transformedData = {
       idUser: userData.idUser,
-      name: userData.name,
+      username: userData.username,
       email: userData.email,
       password: userData.password,
       phone: userData.phone,

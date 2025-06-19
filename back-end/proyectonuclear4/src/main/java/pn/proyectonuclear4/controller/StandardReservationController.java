@@ -9,7 +9,9 @@ import pn.proyectonuclear4.service.StandardReservationService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/standard-reservations")
@@ -67,5 +69,91 @@ public class StandardReservationController {
             @RequestParam LocalDateTime startDate,
             @RequestParam LocalDateTime endDate) {
         return ResponseEntity.ok(standardReservationService.getStandardReservationsByParkingLotIdAndDateRange(parkingLotId, startDate, endDate));
+    }
+
+    // Nuevos endpoints para el flujo de confirmación
+    @PutMapping("/confirm/{id}")
+    public ResponseEntity<StandardReservationDto> confirmReservation(@PathVariable int id) {
+        try {
+            return ResponseEntity.ok(standardReservationService.confirmReservation(id));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/admin-confirm/{id}")
+    public ResponseEntity<StandardReservationDto> adminConfirmReservation(@PathVariable int id) {
+        try {
+            return ResponseEntity.ok(standardReservationService.adminConfirmReservation(id));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/start/{id}")
+    public ResponseEntity<StandardReservationDto> startReservation(@PathVariable int id) {
+        try {
+            return ResponseEntity.ok(standardReservationService.startReservation(id));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/complete/{id}")
+    public ResponseEntity<StandardReservationDto> completeReservation(@PathVariable int id) {
+        try {
+            return ResponseEntity.ok(standardReservationService.completeReservation(id));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/payment/{id}")
+    public ResponseEntity<StandardReservationDto> processPayment(
+            @PathVariable int id,
+            @RequestParam int paymentMethodId) {
+        try {
+            return ResponseEntity.ok(standardReservationService.processPayment(id, paymentMethodId));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/parking-lot-admin/{adminId}")
+    public ResponseEntity<List<StandardReservationDto>> getStandardReservationsByParkingLotAdmin(@PathVariable int adminId) {
+        System.out.println("DEBUG: Endpoint llamado con adminId: " + adminId);
+        List<StandardReservationDto> reservations = standardReservationService.getStandardReservationsByParkingLotAdmin(adminId);
+        System.out.println("DEBUG: Endpoint retornando " + reservations.size() + " reservas");
+        return ResponseEntity.ok(reservations);
+    }
+
+    @PutMapping("/user-request-start/{id}")
+    public ResponseEntity<StandardReservationDto> userRequestStart(@PathVariable int id) {
+        try {
+            return ResponseEntity.ok(standardReservationService.userRequestStart(id));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/debug/admin-info/{adminId}")
+    public ResponseEntity<Map<String, Object>> debugAdminInfo(@PathVariable int adminId) {
+        Map<String, Object> debugInfo = new HashMap<>();
+        
+        try {
+            // Contar parking lots del admin
+            int parkingLotsCount = standardReservationService.countParkingLotsByAdmin(adminId);
+            debugInfo.put("adminId", adminId);
+            debugInfo.put("parkingLotsCount", parkingLotsCount);
+            
+            // Obtener reservas con consulta original
+            List<StandardReservationDto> reservationsOriginal = standardReservationService.getStandardReservationsByParkingLotAdmin(adminId);
+            debugInfo.put("reservationsCount", reservationsOriginal.size());
+            
+            return ResponseEntity.ok(debugInfo);
+        } catch (Exception e) {
+            debugInfo.put("error", e.getMessage());
+            return ResponseEntity.ok(debugInfo);
+        }
     }
 }

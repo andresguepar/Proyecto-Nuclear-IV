@@ -1,8 +1,9 @@
 <template>
   <LayoutAuthenticated>
     <SectionMain>
-      <div class="flex justify-center mb-6">
+      <div class="flex flex-col items-center justify-center mb-6">
         <img src="@/assets/images/spotnpark-logo-home.png" alt="SpotNPark Logo" class="h-120" />
+
       </div>
       <div class="mt-4 text-center font-semibold text-3xl mb-6" style="color: #0e2338;">
         <span style="color: #e1ebf5;">Book </span>
@@ -171,8 +172,9 @@
 </template>
 
 <script setup>
-/* global google */
 import { ref, onMounted, watch, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth.js'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
@@ -188,6 +190,9 @@ import { standardFeesService } from '@/services/standardFeesService'
 import { monthlyFeesService } from '@/services/monthlyFeesService'
 import { schedulesService } from '@/services/schedulesService.js'
 import { addOnServicesService } from '@/services/addOnServicesService'
+
+const authStore = useAuthStore()
+const router = useRouter()
 
 const activeTab = ref('standart')
 const parkingLots = ref([])

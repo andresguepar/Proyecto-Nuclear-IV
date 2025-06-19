@@ -199,6 +199,17 @@ export const schedulesService = {
     }
   },
 
+  async getDailySchedulesByParkingLot(parkingLotId) {
+    try {
+      console.log(`Obteniendo horarios diarios para parking lot ${parkingLotId}`)
+      const response = await axios.get(`${DAILY_API_URL}/parking-lot/${parkingLotId}`)
+      return response.data
+    } catch (error) {
+      console.error('Error al obtener horarios diarios por parking lot:', error)
+      throw error
+    }
+  },
+
   async getDailySchedulesByScheduleAndWeekDay(scheduleId, weekDayId, isActive) {
     try {
       console.log(`Obteniendo horarios diarios por schedule ${scheduleId}, weekDay ${weekDayId}, activo: ${isActive}`)

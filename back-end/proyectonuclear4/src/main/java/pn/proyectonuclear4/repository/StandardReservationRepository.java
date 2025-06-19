@@ -26,4 +26,17 @@ public interface StandardReservationRepository extends JpaRepository<StandardRes
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
+    @Query("SELECT sr FROM StandardReservation sr " +
+            "WHERE sr.slot.parkingLot.admin.idUser = :adminId")
+    List<StandardReservation> findByParkingLotAdmin(@Param("adminId") int adminId);
+
+    @Query("SELECT sr FROM StandardReservation sr " +
+            "JOIN sr.slot s " +
+            "JOIN s.parkingLot pl " +
+            "WHERE pl.admin.idUser = :adminId")
+    List<StandardReservation> findByParkingLotAdminDebug(@Param("adminId") int adminId);
+
+    @Query("SELECT COUNT(pl) FROM ParkingLot pl WHERE pl.admin.idUser = :adminId")
+    int countParkingLotsByAdmin(@Param("adminId") int adminId);
 }

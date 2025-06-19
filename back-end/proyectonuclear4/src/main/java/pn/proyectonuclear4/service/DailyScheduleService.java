@@ -17,4 +17,6 @@ public interface DailyScheduleService {
     List<DailyScheduleDto> getDailySchedulesByIsActive(Boolean isActive);
 
     List<DailyScheduleDto> getDailySchedulesByWeekDayAndScheduleAndIsActive(int scheduleId, int weekDayId, Boolean isActive);
+
+    List<DailyScheduleDto> getDailySchedulesByParkingLot(int parkingLotId);
 }

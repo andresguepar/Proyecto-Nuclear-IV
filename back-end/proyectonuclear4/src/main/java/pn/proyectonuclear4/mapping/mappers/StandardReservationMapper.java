@@ -2,26 +2,24 @@ package pn.proyectonuclear4.mapping.mappers;
 
 import pn.proyectonuclear4.entity.StandardReservation;
 import pn.proyectonuclear4.mapping.dto.StandardReservationDto;
-import lombok.Builder;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Builder
 public class StandardReservationMapper {
     public static StandardReservationDto mapFrom(StandardReservation source) {
-        return StandardReservationDto.builder()
-                .idStandardReservation(source.getIdStandardReservation())
-                .slot(source.getSlot())
-                .user(source.getUser())
-                .payment(source.getPayment())
-                .scheduledDateTime(source.getScheduledDateTime())
-                .checkIn(source.getCheckIn())
-                .checkOut(source.getCheckOut())
-                .reservationDate(source.getReservationDate())
-                .plate(source.getPlate())
-                .statusReservation(source.getStatusReservation())
-                .build();
+        return new StandardReservationDto(
+                source.getIdStandardReservation(),
+                source.getSlot(),
+                source.getUser(),
+                source.getPayment(),
+                source.getScheduledDateTime(),
+                source.getCheckIn(),
+                source.getCheckOut(),
+                source.getReservationDate(),
+                source.getPlate(),
+                source.getStatusReservation()
+        );
     }
 
     public static StandardReservation mapFrom(StandardReservationDto source) {

@@ -18,4 +18,11 @@ public interface DailyScheduleRepository extends JpaRepository<DailySchedule, In
     List<DailySchedule> findByWeekDayAndScheduleAndIsActive(@Param("scheduleId")int scheduleId, @Param("weekDayId")int weekDayId);
 
     List<DailySchedule> findByIsActive(Boolean isActive);
+
+    @Query("SELECT ds FROM DailySchedule ds " +
+           "JOIN ds.schedule s " +
+           "WHERE s.parkingLot.idParkingLot = :parkingLotId " +
+           "AND ds.isActive = true " +
+           "ORDER BY ds.weekDay.idWeekDay, ds.startTime")
+    List<DailySchedule> findByParkingLot(@Param("parkingLotId") int parkingLotId);
 }

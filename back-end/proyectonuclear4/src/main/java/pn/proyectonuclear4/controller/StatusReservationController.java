@@ -48,4 +48,12 @@ public class StatusReservationController {
     public ResponseEntity<List<StatusReservationDto>> getStatusReservationsByIsActive(@PathVariable Boolean isActive) {
         return ResponseEntity.ok(statusReservationService.getStatusReservationsByIsActive(isActive));
     }
+
+    // Endpoint temporal para debug
+    @GetMapping("/debug/all")
+    public ResponseEntity<List<StatusReservationDto>> getAllStatusReservationsDebug() {
+        List<StatusReservationDto> allStatuses = statusReservationService.getAllStatusReservations();
+        System.out.println("Available statuses: " + allStatuses);
+        return ResponseEntity.ok(allStatuses);
+    }
 }

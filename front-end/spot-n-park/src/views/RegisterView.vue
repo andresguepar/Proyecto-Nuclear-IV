@@ -28,12 +28,12 @@ const submit = async () => {
   try {
     await usersService.createUser({
       idUser: undefined,
-      name: form.username,
+      username: form.username, // Usar username
       email: form.email,
       password: form.password,
       phone: form.phone,
       isActive: true,
-      id_role: 2 // Asumiendo rol de usuario normal
+      id_role: 1 // Asignar siempre rol basic_user
     })
     router.push('/login')
   } catch (e) {
@@ -70,6 +70,7 @@ const submit = async () => {
           </FormField>
           <div v-if="error" class="text-red-600 text-sm mb-2 text-center">{{ error }}</div>
           <BaseButton type="submit" color="info" label="Registrarse" class="w-full mt-4" />
+
         </CardBox>
       </div>
     </div>

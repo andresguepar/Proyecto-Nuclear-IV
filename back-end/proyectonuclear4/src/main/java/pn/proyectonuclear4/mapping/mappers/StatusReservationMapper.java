@@ -2,19 +2,17 @@ package pn.proyectonuclear4.mapping.mappers;
 
 import pn.proyectonuclear4.entity.StatusReservation;
 import pn.proyectonuclear4.mapping.dto.StatusReservationDto;
-import lombok.Builder;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Builder
 public class StatusReservationMapper {
     public static StatusReservationDto mapFrom(StatusReservation source) {
-        return StatusReservationDto.builder()
-                .idStatusReservation(source.getIdStatusReservation())
-                .name(source.getName())
-                .isActive(source.getIsActive())
-                .build();
+        return new StatusReservationDto(
+                source.getIdStatusReservation(),
+                source.getName(),
+                source.getIsActive()
+        );
     }
 
     public static StatusReservation mapFrom(StatusReservationDto source) {
