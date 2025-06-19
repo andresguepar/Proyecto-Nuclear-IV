@@ -10,49 +10,32 @@ import java.util.stream.Collectors;
 
 @Component
 public class AddOnServiceMapper {
-    public AddOnServiceDto mapFrom(AddOnService source) {
-        if (source == null) {
-            return null;
-        }
-        return new AddOnServiceDto(
-            source.getIdAddOnService(),
-            source.getName(),
-            source.getDescription(),
-            source.getPrice(),
-            source.getIsActive(),
-            source.getParkingLot()
-        );
-    }
-
-    public AddOnService mapFrom(AddOnServiceDto source) {
-        if (source == null) {
-            return null;
-        }
-        return AddOnService.builder()
-                .idAddOnService(source.idAddOnService())
-                .name(source.name())
-                .description(source.description())
-                .price(source.price())
-                .isActive(source.isActive())
-                .parkingLot(source.parkingLot())
+    public static AddOnServiceDto mapFrom(AddOnService source){
+        return AddOnServiceDto.builder()
+                .idAddOnService(source.getIdAddOnService())
+                .name(source.getName())
+                .description(source.getDescription())
+                .price(source.getPrice())
+                .isActive(source.getIsActive())
+                .parkingLot(source.getParkingLot())
                 .build();
     }
 
-    public List<AddOnServiceDto> mapFrom(List<AddOnService> source) {
-        if (source == null) {
-            return Collections.emptyList();
-        }
-        return source.stream()
-                .map(this::mapFrom)
-                .collect(Collectors.toList());
+    public static AddOnService mapFrom(AddOnServiceDto source){
+        return AddOnService.builder()
+                .idAddOnService(source.getIdAddOnService())
+                .name(source.getName())
+                .description(source.getDescription())
+                .price(source.getPrice())
+                .isActive(source.getIsActive())
+                .parkingLot(source.getParkingLot())
+                .build();
     }
 
-    public List<AddOnService> mapToEntities(List<AddOnServiceDto> source) {
-        if (source == null) {
-            return Collections.emptyList();
-        }
-        return source.stream()
-                .map(this::mapFrom)
-                .collect(Collectors.toList());
+    public static List<AddOnServiceDto> mapFrom(List<AddOnService> source){
+        return source.stream().map(AddOnServiceMapper::mapFrom).collect(Collectors.toList());
+    }
+    public static List<AddOnService> mapToEntities(List<AddOnServiceDto> source) {
+        return source.stream().map(AddOnServiceMapper::mapFrom).collect(Collectors.toList());
     }
 }

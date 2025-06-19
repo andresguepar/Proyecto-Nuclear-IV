@@ -1,14 +1,15 @@
 package pn.proyectonuclear4.mapping.dto;
 
 import lombok.Builder;
+import lombok.Data;
 import pn.proyectonuclear4.entity.StandardReservation;
-
+@Data
 @Builder
-public record AddOnServiceFeeDto(
-        int idAddOnServiceFee,
-        Double total,
-        String addOnServices,
-        Boolean isActive,
-        StandardReservation standardReservation
-) {
+public class AddOnServiceFeeDto{
+        private int idAddOnServiceFee;
+        private Double total;
+        private String addOnServices;
+        private Boolean isActive;
+        private StandardReservation standardReservation;
+
 }

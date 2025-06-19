@@ -1,15 +1,15 @@
 package pn.proyectonuclear4.mapping.dto;
 
 import lombok.Builder;
+import lombok.Data;
 import pn.proyectonuclear4.entity.VehicleType;
 import pn.proyectonuclear4.entity.ParkingLot;
-
+@Data
 @Builder
-public record MonthlyFeeDto(
-        int idMonthlyFee,
-        VehicleType vehicleType,
-        ParkingLot parkingLot,
-        Double price,
-        Boolean isActive
-) {
+public class MonthlyFeeDto{
+        private int idMonthlyFee;
+        private VehicleType vehicleType;
+        private ParkingLot parkingLot;
+        private Double price;
+        private Boolean isActive;
 }

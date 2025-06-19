@@ -21,11 +21,11 @@ public class PaymentMapper {
 
     public static Payment mapFrom(PaymentDto source) {
         return Payment.builder()
-                .idPayment(source.idPayment())
-                .paymentDate(source.paymentDate())
-                .status(source.status())
-                .paymentMethod(source.paymentMethod())
-                .fee(source.fee())
+                .idPayment(source.getIdPayment())
+                .paymentDate(source.getPaymentDate())
+                .status(source.getStatus())
+                .paymentMethod(source.getPaymentMethod())
+                .fee(source.getFee())
                 .build();
     }
 

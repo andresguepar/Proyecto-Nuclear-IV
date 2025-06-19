@@ -19,9 +19,9 @@ public class PaymentMethodMapper {
 
     public static PaymentMethod mapFrom(PaymentMethodDto source) {
         return PaymentMethod.builder()
-                .idPaymentMethod(source.idPaymentMethod())
-                .name(source.name())
-                .isActive(source.isActive())
+                .idPaymentMethod(source.getIdPaymentMethod())
+                .name(source.getName())
+                .isActive(source.getIsActive())
                 .build();
     }
 
