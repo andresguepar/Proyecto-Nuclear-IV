@@ -38,31 +38,31 @@ export default [
     to: '/slots',
     icon: mdiCar,
     label: 'Slots',
-    roles: ['park_admin', 'super_admin']
+    roles: ['park_admin']
   },
   {
     to: '/dashboard',
     icon: mdiMonitor,
     label: 'Dashboard',
-    roles: ['park_admin', 'super_admin']
+    roles: ['park_admin']
   },
   {
     to: '/fees',
     icon: mdiCashMultiple,
     label: 'Fees',
-    roles: ['park_admin', 'super_admin']
+    roles: ['park_admin']
   },
   {
     to: '/schedules',
     icon: mdiCalendarMonth,
     label: 'Schedules',
-    roles: ['park_admin', 'super_admin']
+    roles: ['park_admin']
   },
   {
     to: '/parking-lots',
     icon: mdiParking,
     label: 'Parking Lots',
-    roles: ['park_admin', 'super_admin']
+    roles: ['super_admin']
   },
   {
     to: '/users',

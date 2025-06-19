@@ -25,7 +25,6 @@
                 <thead>
                   <tr>
                     <th>ID</th>
-                    <th>Parking Lot</th>
                     <th>Vehicle Type</th>
                     <th>Price per Hour</th>
                     <th>12 Hours Price</th>
@@ -40,7 +39,6 @@
                   </tr>
                   <tr v-for="fee in standardFees" :key="fee.id">
                     <td data-label="ID">{{ fee.id }}</td>
-                    <td data-label="Parking Lot">{{ fee.parking_lot_name }}</td>
                     <td data-label="Vehicle Type">{{ fee.vehicle_type_name }}</td>
                     <td data-label="Price per Hour">${{ fee.price_x_hours }}</td>
                     <td data-label="12 Hours Price">${{ fee.price_x_12_hours }}</td>
@@ -73,7 +71,6 @@
                 <thead>
                   <tr>
                     <th>ID</th>
-                    <th>Parking Lot</th>
                     <th>Vehicle Type</th>
                     <th>Price</th>
                     <th />
@@ -87,7 +84,6 @@
                   </tr>
                   <tr v-for="fee in monthlyFees" :key="fee.id">
                     <td data-label="ID">{{ fee.id }}</td>
-                    <td data-label="Parking Lot">{{ fee.parking_lot_name }}</td>
                     <td data-label="Vehicle Type">{{ fee.vehicle_type_name }}</td>
                     <td data-label="Price">${{ fee.price }}</td>
                     <td class="before:hidden lg:w-1 whitespace-nowrap">
@@ -119,8 +115,6 @@
                 <thead>
                   <tr>
                     <th>ID</th>
-                    <th>Parking Lot</th>
-                    <th>Vehicle Type</th>
                     <th>Name</th>
                     <th>Description</th>
                     <th>Price</th>
@@ -130,14 +124,12 @@
                 </thead>
                 <tbody>
                   <tr v-if="parkingServices.length === 0">
-                    <td colspan="8" class="text-center py-24 text-gray-500 dark:text-slate-400">
+                    <td colspan="7" class="text-center py-24 text-gray-500 dark:text-slate-400">
                       <p>No parking services found</p>
                     </td>
                   </tr>
                   <tr v-for="service in parkingServices" :key="service.id">
                     <td data-label="ID">{{ service.id }}</td>
-                    <td data-label="Parking Lot">{{ service.parkingLot.name }}</td>
-                    <td data-label="Vehicle Type">{{ service.vehicleType }}</td>
                     <td data-label="Name">{{ service.name }}</td>
                     <td data-label="Description">{{ service.description }}</td>
                     <td data-label="Price">${{ service.price }}</td>
@@ -177,7 +169,7 @@
             <form @submit.prevent="handleSubmit" class="space-y-4">
               <!-- Standard Fees Form -->
               <div v-if="activeTab === 'standard'">
-                <div class="mb-4">
+                <div v-if="user.value && user.value.role && user.value.role.name === 'super_admin'" class="mb-4">
                   <label class="block text-sm font-medium mb-2">Parking Lot</label>
                   <select
                     v-model="form.id_parking_lot"
@@ -227,7 +219,7 @@
 
               <!-- Monthly Fees Form -->
               <div v-if="activeTab === 'monthly'">
-                <div class="mb-4">
+                <div v-if="user.value && user.value.role && user.value.role.name === 'super_admin'" class="mb-4">
                   <label class="block text-sm font-medium mb-2">Parking Lot</label>
                   <select
                     v-model="form.id_parking_lot"
@@ -267,6 +259,19 @@
 
               <!-- Services Form (existing code) -->
               <div v-if="activeTab === 'services'">
+                <div v-if="user.value && user.value.role && user.value.role.name === 'super_admin'" class="mb-4">
+                  <label class="block text-sm font-medium mb-2">Parking Lot</label>
+                  <select
+                    v-model="form.id_parking_lot"
+                    class="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
+                    required
+                  >
+                    <option value="">Select a parking lot</option>
+                    <option v-for="lot in parkingLots" :key="lot.id" :value="lot.id">
+                      {{ lot.name }}
+                    </option>
+                  </select>
+                </div>
                 <div class="mb-4">
                   <label class="block text-sm font-medium mb-2">Name</label>
                   <input
@@ -332,7 +337,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { mdiCashMultiple, mdiPencil, mdiClose } from '@mdi/js'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionMain from '@/components/SectionMain.vue'
@@ -346,6 +351,10 @@ import { monthlyFeesService } from '@/services/monthlyFeesService'
 import { addOnServicesService } from '@/services/addOnServicesService'
 import { parkingLotsService } from '@/services/parkingLotsService'
 import { vehicleTypesService } from '@/services/vehicleTypesService'
+import { useAuthStore } from '@/stores/auth.js'
+
+const authStore = useAuthStore()
+const user = computed(() => authStore.user)
 
 const tabs = [
   { key: 'standard', label: 'Standard Fees' },
@@ -494,6 +503,13 @@ const resetForm = () => {
 
 const handleSubmit = async () => {
   try {
+    // Si el usuario es park_admin, asignar automáticamente su parking lot
+    if (user.value && user.value.role && user.value.role.name === 'park_admin') {
+      const myLot = parkingLots.value.find(lot => lot.adminId === user.value.idUser || lot.admin?.idUser === user.value.idUser)
+      if (myLot) {
+        form.value.id_parking_lot = myLot.id
+      }
+    }
     if (activeTab.value === 'services') {
       if (form.value.id) {
         await addOnServicesService.updateAddOnService(form.value.id, form.value)

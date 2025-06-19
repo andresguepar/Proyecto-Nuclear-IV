@@ -20,7 +20,6 @@
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Parking Lot</th>
                   <th>Day</th>
                   <th>Open Time</th>
                   <th>Close Time</th>
@@ -35,7 +34,6 @@
                 </tr>
                 <tr v-for="schedule in combinedSchedules" :key="schedule.idSchedule + '-' + schedule.dayOfWeek">
                   <td data-label="ID">{{ schedule.idDailySchedule || schedule.idSchedule }}</td>
-                  <td data-label="Parking Lot">{{ schedule.parkingLot?.name }}</td>
                   <td data-label="Day">{{ getWeekDayName(schedule.dayOfWeek) }}</td>
                   <td data-label="Open Time">{{ formatTime(schedule.startTime) }}</td>
                   <td data-label="Close Time">{{ formatTime(schedule.endTime) }}</td>
@@ -66,7 +64,7 @@
           <CardBox>
             <h2 class="text-xl font-bold mb-4">{{ isEditing ? 'Edit Schedule' : 'Create New Schedule' }}</h2>
             <form @submit.prevent="handleScheduleSubmit">
-              <div class="mb-4">
+              <div class="mb-4" v-if="user.value && user.value.role && user.value.role.name === 'super_admin'">
                 <label class="block text-sm font-medium mb-2">Parking Lot</label>
                 <select
                   v-model="form.parkingLot.id"
@@ -127,7 +125,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { mdiCalendar, mdiPencil, mdiClose } from '@mdi/js'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionMain from '@/components/SectionMain.vue'
@@ -138,7 +136,10 @@ import BaseButtons from '@/components/BaseButtons.vue'
 import { parkingLotsService } from '@/services/parkingLotsService'
 import { weekDaysService } from '@/services/weekDaysService'
 import { schedulesService } from '@/services/schedulesService'
+import { useAuthStore } from '@/stores/auth.js'
 
+const authStore = useAuthStore()
+const user = computed(() => authStore.user)
 const schedules = ref([])
 const dailySchedules = ref([])
 const combinedSchedules = ref([])
@@ -186,8 +187,6 @@ const getWeekDayName = (dayId) => {
   return day ? day.name : 'Unknown'
 }
 
-
-
 const editSchedule = (schedule) => {
   isEditing.value = true
   form.value = {
@@ -203,6 +202,13 @@ const editSchedule = (schedule) => {
 
 const handleScheduleSubmit = async () => {
   try {
+    // Si el usuario es park_admin, asignar automáticamente su parking lot
+    if (user.value && user.value.role && user.value.role.name === 'park_admin') {
+      const myLot = parkingLots.value.find(lot => lot.adminId === user.value.idUser || lot.admin?.idUser === user.value.idUser)
+      if (myLot) {
+        form.value.parkingLot.id = myLot.idParkingLot
+      }
+    }
     const scheduleData = {
       id: form.value.idSchedule,
       idDailySchedule: form.value.idDailySchedule,

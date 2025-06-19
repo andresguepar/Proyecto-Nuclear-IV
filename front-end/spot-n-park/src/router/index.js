@@ -28,7 +28,7 @@ const routes = [
     meta: {
       title: 'Slots',
       requiresAuth: true,
-      roles: ['park_admin', 'super_admin']
+      roles: ['park_admin']
     },
     path: '/slots',
     name: 'slots',
@@ -47,17 +47,17 @@ const routes = [
     meta: {
       title: 'Dashboard',
       requiresAuth: true,
-      roles: ['park_admin', 'super_admin']
+      roles: ['park_admin']
     },
     path: '/dashboard',
     name: 'dashboard',
-    component: () => import("@/views/DashboardView.vue"),
+    component: () => import('@/views/DashboardView.vue'),
   },
   {
     meta: {
       title: 'Parking Lots',
       requiresAuth: true,
-      roles: ['park_admin', 'super_admin']
+      roles: ['super_admin']
     },
     path: '/parking-lots',
     name: 'parking-lots',
@@ -67,7 +67,7 @@ const routes = [
     meta: {
       title: 'Schedules',
       requiresAuth: true,
-      roles: ['park_admin', 'super_admin']
+      roles: ['park_admin']
     },
     path: '/schedules',
     name: 'schedules',
@@ -77,7 +77,7 @@ const routes = [
     meta: {
       title: 'Fees',
       requiresAuth: true,
-      roles: ['park_admin', 'super_admin']
+      roles: ['park_admin']
     },
     path: '/fees',
     name: 'fees',
@@ -194,6 +194,11 @@ router.beforeEach((to, from, next) => {
 
     // Si la ruta requiere roles específicos
     if (to.meta.roles && !to.meta.roles.includes(role)) {
+      // Protección extra para /parking-lots
+      if (to.path === '/parking-lots') {
+        console.log('Intento de acceso no autorizado a /parking-lots, redirigiendo a Home')
+        return next('/')
+      }
       console.log('Role not authorized, redirecting to home')
       return next('/')
     }

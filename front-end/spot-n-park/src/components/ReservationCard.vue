@@ -28,7 +28,7 @@
               class="w-6 h-6 text-gray-500"
             />
             <span class="text-base text-gray-600">
-              Precio/hora: ${{ reservation.pricePerHour }}
+              Slot: {{ reservation.slot?.name || reservation.slot }}
             </span>
           </div>
           <div class="flex items-center space-x-2">
@@ -53,18 +53,10 @@
               class="w-6 h-6 text-gray-500"
             />
             <span :class="getStatusClass(reservation.status)" class="text-base">
-              {{ reservation.status }}
+              {{ getStatusText(reservation.status) }}
             </span>
           </div>
-          <div class="flex items-center space-x-2">
-            <BaseIcon
-              path="M12 3v1m0 4v1m6 4h2a2 2 0 002-2V7a2 2 0 00-2-2h-2M6 5H4a2 2 0 00-2 2v4a2 2 0 002 2h2"
-              class="w-6 h-6 text-gray-500"
-            />
-            <span class="text-base text-gray-600">
-              Horario: {{ reservation.startDate && reservation.startTime ? `${reservation.startDate} ${reservation.startTime}${reservation.endTime ? ' - ' + reservation.endTime : ''}` : reservation.hours }}
-            </span>
-          </div>
+
           <div class="flex items-center space-x-2">
             <BaseIcon
               path="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
@@ -81,6 +73,38 @@
               Tipo de vehículo: {{ reservation.vehicleType }}
             </span>
           </div>
+          <!-- Precio por tipo de vehículo -->
+          <div v-if="reservation.pricePerHour" class="flex items-center space-x-2">
+            <BaseIcon
+              path="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              class="w-6 h-6 text-gray-500"
+            />
+            <span class="text-base text-gray-600">
+              Precio: ${{ reservation.pricePerHour }}/hora
+              <span v-if="reservation.priceForTwelveHours" class="text-sm text-gray-500">
+                (12h: ${{ reservation.priceForTwelveHours }})
+              </span>
+            </span>
+          </div>
+          <!-- Información del usuario para admins -->
+          <div v-if="isAdmin" class="flex items-center space-x-2">
+            <BaseIcon
+              path="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              class="w-6 h-6 text-gray-500"
+            />
+            <span class="text-base text-gray-600">
+              Usuario: {{ reservation.userName }}
+            </span>
+          </div>
+          <div v-if="isAdmin" class="flex items-center space-x-2">
+            <BaseIcon
+              path="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              class="w-6 h-6 text-gray-500"
+            />
+            <span class="text-base text-gray-600">
+              Email: {{ reservation.userEmail }}
+            </span>
+          </div>
         </div>
       </div>
     </CardBoxComponentBody>
@@ -88,21 +112,51 @@
       <div class="flex justify-between space-x-2">
         <BaseButton
           color="danger"
-          label="Cancel"
+          label="Cancelar"
           :disabled="reservation.status === 'CANCELED'"
           @click="$emit('cancel', reservation)"
         />
         <BaseButton
+          v-if="canEdit"
           color="info"
-          label="Edit"
-          :disabled="reservation.status === 'CANCELED'"
+          label="Editar"
           @click="$emit('edit', reservation)"
         />
         <BaseButton
+          v-if="isPending"
           color="success"
           label="Confirmar"
-          :disabled="reservation.status === 'CANCELED'"
           @click="$emit('confirm', reservation)"
+        />
+        <BaseButton
+          v-if="isPendingAdminConfirmation"
+          color="warning"
+          label="Confirmar Reserva"
+          @click="$emit('adminConfirm', reservation)"
+        />
+        <BaseButton
+          v-if="isUserConfirmed"
+          color="info"
+          label="Iniciar"
+          @click="$emit('userRequestStart', reservation)"
+        />
+        <BaseButton
+          v-if="isConfirmed && isAdmin"
+          color="warning"
+          label="Confirmar Inicio"
+          @click="$emit('start', reservation)"
+        />
+        <BaseButton
+          v-if="isInProgress"
+          color="info"
+          label="Confirmar Salida"
+          @click="$emit('complete', reservation)"
+        />
+        <BaseButton
+          v-if="isCompleted"
+          color="success"
+          label="Pagar"
+          @click="$emit('pay', reservation)"
         />
       </div>
     </div>
@@ -114,26 +168,125 @@ import CardBox from '@/components/CardBox.vue'
 import CardBoxComponentBody from '@/components/CardBoxComponentBody.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseIcon from '@/components/BaseIcon.vue'
+import { computed } from 'vue'
+
+const props = defineProps({
+  reservation: {
+    type: Object,
+    required: true
+  },
+  isAdmin: {
+    type: Boolean,
+    default: false
+  }
+})
+
+// Debug log para ver el estado de la reserva
+console.log('ReservationCard received reservation:', props.reservation)
+console.log('Reservation status:', props.reservation?.status)
 
 const getStatusClass = (status) => {
-  switch (status) {
+  const statusUpper = status?.toUpperCase()
+  switch (statusUpper) {
+    case 'PENDIENTE':
+    case 'PENDING':
     case 'ACTIVE':
+      return 'text-yellow-600'
+    case 'PENDIENTE DE CONFIRMACIÓN DEL ADMIN':
+    case 'PENDIENTE_ADMIN_CONFIRMATION':
+      return 'text-orange-600'
+    case 'CONFIRMADA':
+    case 'CONFIRMED':
+      return 'text-blue-600'
+    case 'EN CURSO':
+    case 'IN PROGRESS':
+    case 'EN_PROGRESO':
       return 'text-green-600'
+    case 'COMPLETADA':
+    case 'COMPLETED':
+      return 'text-purple-600'
+    case 'PAGADA':
+    case 'PAID':
+      return 'text-green-700'
+    case 'CANCELADA':
     case 'CANCELED':
       return 'text-red-600'
-    case 'COMPLETED':
-      return 'text-blue-600'
     default:
       return 'text-gray-600'
   }
 }
 
-defineProps({
-  reservation: {
-    type: Object,
-    required: true
+const getStatusText = (status) => {
+  const statusUpper = status?.toUpperCase()
+  switch (statusUpper) {
+    case 'PENDIENTE':
+    case 'PENDING':
+    case 'ACTIVE':
+      return 'Pendiente'
+    case 'PENDIENTE DE CONFIRMACIÓN DEL ADMIN':
+    case 'PENDIENTE_ADMIN_CONFIRMATION':
+      return 'Pendiente de Confirmación del Admin'
+    case 'CONFIRMADA':
+    case 'CONFIRMED':
+      return 'Confirmada'
+    case 'EN CURSO':
+    case 'IN PROGRESS':
+    case 'EN_PROGRESO':
+      return 'En Curso'
+    case 'COMPLETADA':
+    case 'COMPLETED':
+      return 'Completada'
+    case 'PAGADA':
+    case 'PAID':
+      return 'Pagada'
+    case 'CANCELADA':
+    case 'CANCELED':
+      return 'Cancelada'
+    default:
+      return status || 'Desconocido'
   }
+}
+
+const canEdit = computed(() => {
+  const status = props.reservation.status?.toUpperCase()
+  return ['PENDIENTE', 'PENDING', 'ACTIVE', 'CONFIRMADA', 'CONFIRMED'].includes(status) && !props.isAdmin
 })
 
-defineEmits(['edit', 'cancel', 'confirm'])
+const isPending = computed(() => {
+  // Solo usuarios normales pueden confirmar sus propias reservas
+  const status = props.reservation.status?.toUpperCase()
+  return (status === 'PENDIENTE' || status === 'PENDING' || status === 'ACTIVE') && !props.isAdmin
+})
+
+const isPendingAdminConfirmation = computed(() => {
+  const status = props.reservation.status?.toUpperCase()
+  // Solo admins pueden confirmar reservas pendientes
+  return (status === 'PENDIENTE' || status === 'PENDING' || status === 'ACTIVE') && props.isAdmin
+})
+
+const isConfirmed = computed(() => {
+  const status = props.reservation.status?.toUpperCase()
+  // Usuarios pueden solicitar inicio, admins pueden iniciar directamente
+  return (status === 'CONFIRMADA' || status === 'CONFIRMED')
+})
+
+const isInProgress = computed(() => {
+  const status = props.reservation.status?.toUpperCase()
+  // Solo admins pueden finalizar reservas en curso
+  return (status === 'EN CURSO' || status === 'IN PROGRESS' || status === 'EN_PROGRESO') && props.isAdmin
+})
+
+const isCompleted = computed(() => {
+  const status = props.reservation.status?.toUpperCase()
+  // Solo usuarios normales pueden pagar reservas completadas
+  return (status === 'COMPLETADA' || status === 'COMPLETED') && !props.isAdmin
+})
+
+const isUserConfirmed = computed(() => {
+  const status = props.reservation.status?.toUpperCase()
+  // Usuarios pueden solicitar inicio cuando está confirmada
+  return (status === 'CONFIRMADA' || status === 'CONFIRMED') && !props.isAdmin
+})
+
+defineEmits(['edit', 'cancel', 'confirm', 'start', 'complete', 'pay', 'adminConfirm', 'userRequestStart'])
 </script>

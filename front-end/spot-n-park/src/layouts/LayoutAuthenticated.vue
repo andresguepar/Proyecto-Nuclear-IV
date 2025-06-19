@@ -42,7 +42,9 @@ const menuClick = (event, item) => {
 
   if (item.isLogout) {
     authStore.logout()
-    router.push('/login')
+    setTimeout(() => {
+      router.push('/login')
+    }, 100)
   }
 }
 

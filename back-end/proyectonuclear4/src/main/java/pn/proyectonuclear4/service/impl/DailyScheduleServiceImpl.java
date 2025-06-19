@@ -73,4 +73,10 @@ public class DailyScheduleServiceImpl implements DailyScheduleService {
         List<DailySchedule> dailySchedules = dailyScheduleRepository.findByWeekDayAndScheduleAndIsActive(scheduleId, weekDayId);
         return dailyScheduleMapper.mapFrom(dailySchedules);
     }
+
+    @Override
+    public List<DailyScheduleDto> getDailySchedulesByParkingLot(int parkingLotId) {
+        List<DailySchedule> dailySchedules = dailyScheduleRepository.findByParkingLot(parkingLotId);
+        return dailyScheduleMapper.mapFrom(dailySchedules);
+    }
 }

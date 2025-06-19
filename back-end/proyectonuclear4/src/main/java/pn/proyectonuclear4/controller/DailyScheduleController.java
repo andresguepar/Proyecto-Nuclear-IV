@@ -59,4 +59,9 @@ public class DailyScheduleController {
                 dailyScheduleService.getDailySchedulesByWeekDayAndScheduleAndIsActive(scheduleId, weekDayId, isActive)
         );
     }
+
+    @GetMapping("/parking-lot/{parkingLotId}")
+    public ResponseEntity<List<DailyScheduleDto>> getByParkingLot(@PathVariable int parkingLotId) {
+        return ResponseEntity.ok(dailyScheduleService.getDailySchedulesByParkingLot(parkingLotId));
+    }
 }

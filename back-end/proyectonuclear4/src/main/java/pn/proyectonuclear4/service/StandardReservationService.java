@@ -22,4 +22,21 @@ public interface StandardReservationService {
     List<StandardReservationDto> getStandardReservationsByUserId(int userId);
 
     List<StandardReservationDto> getStandardReservationsByParkingLotIdAndDateRange(int parkingLotId, LocalDateTime startDate, LocalDateTime endDate);
+
+    // Nuevos métodos para el flujo de confirmación
+    StandardReservationDto confirmReservation(int id) throws ResourceNotFoundException;
+    
+    StandardReservationDto adminConfirmReservation(int id) throws ResourceNotFoundException;
+    
+    StandardReservationDto startReservation(int id) throws ResourceNotFoundException;
+    
+    StandardReservationDto completeReservation(int id) throws ResourceNotFoundException;
+    
+    StandardReservationDto processPayment(int id, int paymentMethodId) throws ResourceNotFoundException;
+
+    List<StandardReservationDto> getStandardReservationsByParkingLotAdmin(int adminId);
+
+    StandardReservationDto userRequestStart(int id) throws ResourceNotFoundException;
+
+    int countParkingLotsByAdmin(int adminId);
 }
