@@ -6,7 +6,7 @@
 
       </div>
       <div class="mt-4 text-center font-semibold text-3xl mb-6" style="color: #0e2338;">
-        <span style="color: #e1ebf5;">Book </span>
+        <span style="color: #0e2338;">Book </span>
         <span style="color: #2e76ae;">your spot, </span>
         <span style="color: #0e2338;">park without </span>
         <span style="color: #ff8f2b;">stop</span>
@@ -580,14 +580,13 @@ const fetchParkingLotsWithInfo = async () => {
       activeTab.value === 'standart' ?
         standardFeesService.getAllStandardFees() :
         monthlyFeesService.getAllMonthlyFees(),
-      slotsService.getSlotsByIsActive(true),
+      slotsService.getAllSlots(),
       schedulesService.getAllDailySchedules()
     ])
 
-    console.log('Fetched parking lots:', lots)
-    console.log('Fetched fees:', fees)
+    // Filtrar solo los slots activos y disponibles
+    const availableAndActiveSlots = slots.filter(slot => slot.isActive && slot.isAvailable)
 
-    // Store the data
     parkingLotsData.value = lots.map(lot => ({
       id: lot.idParkingLot,
       name: lot.name,
@@ -597,8 +596,6 @@ const fetchParkingLotsWithInfo = async () => {
       isActive: lot.isActive
     }))
 
-    console.log('Processed parking lots data:', parkingLotsData.value)
-
     if (activeTab.value === 'standart') {
       standardFees.value = fees
     } else {
@@ -606,7 +603,7 @@ const fetchParkingLotsWithInfo = async () => {
     }
 
     dailySchedules.value = schedules
-    availableSlots.value = slots
+    availableSlots.value = availableAndActiveSlots
 
     // Update the display
     updateParkingLotsDisplay()
@@ -629,9 +626,10 @@ const addHours = (lot) => {
   showReservationModal.value = true
 }
 
-const handleReservationComplete = () => {
+const handleReservationComplete = async () => {
   showReservationModal.value = false
-  // Opcional: recargar slots o reservas
+  // Recargar los datos de slots y parqueaderos después de reservar
+  await fetchParkingLotsWithInfo()
 }
 
 // Función específica para inicializar el mapa de Home

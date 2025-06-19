@@ -7,6 +7,7 @@ export const standardFeesService = {
     const response = await axios.get(`${API_URL}/get`)
     return response.data.map(fee => ({
       ...fee,
+      id: fee.idStandardFee,
       status: fee.isActive ? 'active' : 'inactive',
       price_x_hours: fee.priceForHours,
       price_x_12_hours: fee.priceForTwelveHours,

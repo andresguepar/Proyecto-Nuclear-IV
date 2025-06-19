@@ -426,7 +426,16 @@ const deactivateMonthlyFee = async (id) => {
 const loadStandardFees = async () => {
   try {
     const fees = await standardFeesService.getAllStandardFees()
-    standardFees.value = fees.filter(fee => fee.status === 'active')
+    let filteredFees = fees.filter(fee => fee.status === 'active')
+    if (user.value && user.value.role && user.value.role.name === 'park_admin') {
+      const myLot = parkingLots.value.find(lot => lot.adminId === user.value.idUser || lot.admin?.idUser === user.value.idUser)
+      if (myLot) {
+        filteredFees = filteredFees.filter(fee => fee.parkingLot?.idParkingLot === myLot.id || fee.id_parking_lot === myLot.id)
+      } else {
+        filteredFees = []
+      }
+    }
+    standardFees.value = filteredFees
   } catch (error) {
     console.error('Error loading standard fees:', error)
   }
@@ -435,7 +444,16 @@ const loadStandardFees = async () => {
 const loadMonthlyFees = async () => {
   try {
     const fees = await monthlyFeesService.getAllMonthlyFees()
-    monthlyFees.value = fees.filter(fee => fee.status === 'active')
+    let filteredFees = fees.filter(fee => fee.status === 'active')
+    if (user.value && user.value.role && user.value.role.name === 'park_admin') {
+      const myLot = parkingLots.value.find(lot => lot.adminId === user.value.idUser || lot.admin?.idUser === user.value.idUser)
+      if (myLot) {
+        filteredFees = filteredFees.filter(fee => fee.parkingLot?.idParkingLot === myLot.id || fee.id_parking_lot === myLot.id)
+      } else {
+        filteredFees = []
+      }
+    }
+    monthlyFees.value = filteredFees
   } catch (error) {
     console.error('Error loading monthly fees:', error)
   }
@@ -444,7 +462,16 @@ const loadMonthlyFees = async () => {
 const loadParkingServices = async () => {
   try {
     const services = await addOnServicesService.getAllAddOnServices()
-    parkingServices.value = services
+    let filteredServices = services
+    if (user.value && user.value.role && user.value.role.name === 'park_admin') {
+      const myLot = parkingLots.value.find(lot => lot.adminId === user.value.idUser || lot.admin?.idUser === user.value.idUser)
+      if (myLot) {
+        filteredServices = services.filter(service => service.parkingLot?.idParkingLot === myLot.id || service.id_parking_lot === myLot.id)
+      } else {
+        filteredServices = []
+      }
+    }
+    parkingServices.value = filteredServices
   } catch (error) {
     console.error('Error loading parking services:', error)
   }
@@ -454,8 +481,11 @@ const loadParkingLots = async () => {
   try {
     const lots = await parkingLotsService.getAllParkingLots()
     parkingLots.value = lots.map(lot => ({
+      ...lot,
       id: lot.idParkingLot,
-      name: lot.name
+      name: lot.name,
+      adminId: lot.adminId,
+      admin: lot.admin
     }))
   } catch (error) {
     console.error('Error loading parking lots:', error)
@@ -503,7 +533,6 @@ const resetForm = () => {
 
 const handleSubmit = async () => {
   try {
-    // Si el usuario es park_admin, asignar automáticamente su parking lot
     if (user.value && user.value.role && user.value.role.name === 'park_admin') {
       const myLot = parkingLots.value.find(lot => lot.adminId === user.value.idUser || lot.admin?.idUser === user.value.idUser)
       if (myLot) {
