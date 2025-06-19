@@ -22,12 +22,12 @@ public class SlotMapper {
 
     public static Slot mapFrom(SlotDto source) {
         return Slot.builder()
-                .idSlot(source.idSlot())
-                .name(source.name())
-                .isAvailable(source.isAvailable())
-                .isActive(source.isActive())
-                .parkingLot(source.parkingLot())
-                .vehicleType(source.vehicleType())
+                .idSlot(source.getIdSlot())
+                .name(source.getName())
+                .isAvailable(source.getIsAvailable())
+                .isActive(source.getIsActive())
+                .parkingLot(source.getParkingLot())
+                .vehicleType(source.getVehicleType())
                 .build();
     }
 

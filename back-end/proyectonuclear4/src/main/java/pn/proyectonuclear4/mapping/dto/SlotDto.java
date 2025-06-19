@@ -1,16 +1,18 @@
 package pn.proyectonuclear4.mapping.dto;
 
 import lombok.Builder;
+import lombok.Data;
 import pn.proyectonuclear4.entity.ParkingLot;
 import pn.proyectonuclear4.entity.VehicleType;
-
+@Data
 @Builder
-public record SlotDto(
-        int idSlot,
-        String name,
-        Boolean isAvailable,
-        Boolean isActive,
-        ParkingLot parkingLot,
-        VehicleType vehicleType
-) {
+public class SlotDto{
+    private int idSlot;
+    private String name;
+    private Boolean isAvailable;
+    private Boolean isActive;
+    private ParkingLot parkingLot;
+    private VehicleType vehicleType;
 }
+
+
