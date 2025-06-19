@@ -8,11 +8,11 @@ import java.util.stream.Collectors;
 
 public class StatusReservationMapper {
     public static StatusReservationDto mapFrom(StatusReservation source) {
-        return new StatusReservationDto(
-                source.getIdStatusReservation(),
-                source.getName(),
-                source.getIsActive()
-        );
+        return StatusReservationDto.builder()
+                .idStatusReservation(source.getIdStatusReservation())
+                .name(source.getName())
+                .isActive(source.getIsActive())
+                .build();
     }
 
     public static StatusReservation mapFrom(StatusReservationDto source) {

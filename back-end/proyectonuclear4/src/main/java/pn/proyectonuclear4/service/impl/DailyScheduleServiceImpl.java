@@ -23,35 +23,33 @@ public class DailyScheduleServiceImpl implements DailyScheduleService {
     @Autowired
     private DailyScheduleRepository dailyScheduleRepository;
 
-    @Autowired
-    private DailyScheduleMapper dailyScheduleMapper;
 
     @Override
     public List<DailyScheduleDto> getAllDailySchedules() {
         List<DailySchedule> dailySchedules = dailyScheduleRepository.findAll();
-        return dailyScheduleMapper.mapFrom(dailySchedules);
+        return DailyScheduleMapper.mapFrom(dailySchedules);
     }
 
     @Override
     public Optional<DailyScheduleDto> getDailyScheduleById(int id) {
         Optional<DailySchedule> dailySchedule = dailyScheduleRepository.findById(id);
-        return dailySchedule.map(dailyScheduleMapper::mapFrom);
+        return dailySchedule.map(DailyScheduleMapper::mapFrom);
     }
 
     @Override
     public DailyScheduleDto saveDailySchedule(DailyScheduleDto dailyScheduleDto) {
-        DailySchedule dailySchedule = dailyScheduleMapper.mapFrom(dailyScheduleDto);
+        DailySchedule dailySchedule = DailyScheduleMapper.mapFrom(dailyScheduleDto);
         
         // Asegurarse de que los tiempos estén en formato LocalTime
-        if (dailyScheduleDto.startTime() != null) {
-            dailySchedule.setStartTime(dailyScheduleDto.startTime());
+        if (dailyScheduleDto.getStartTime() != null) {
+            dailySchedule.setStartTime(dailyScheduleDto.getStartTime());
         }
-        if (dailyScheduleDto.endTime() != null) {
-            dailySchedule.setEndTime(dailyScheduleDto.endTime());
+        if (dailyScheduleDto.getEndTime() != null) {
+            dailySchedule.setEndTime(dailyScheduleDto.getEndTime());
         }
         
         DailySchedule savedDailySchedule = dailyScheduleRepository.save(dailySchedule);
-        return dailyScheduleMapper.mapFrom(savedDailySchedule);
+        return DailyScheduleMapper.mapFrom(savedDailySchedule);
     }
 
     @Override
@@ -65,18 +63,18 @@ public class DailyScheduleServiceImpl implements DailyScheduleService {
     @Override
     public List<DailyScheduleDto> getDailySchedulesByIsActive(Boolean isActive) {
         List<DailySchedule> dailySchedules = dailyScheduleRepository.findByIsActive(isActive);
-        return dailyScheduleMapper.mapFrom(dailySchedules);
+        return DailyScheduleMapper.mapFrom(dailySchedules);
     }
 
     @Override
     public List<DailyScheduleDto> getDailySchedulesByWeekDayAndScheduleAndIsActive(int scheduleId, int weekDayId, Boolean isActive) {
         List<DailySchedule> dailySchedules = dailyScheduleRepository.findByWeekDayAndScheduleAndIsActive(scheduleId, weekDayId);
-        return dailyScheduleMapper.mapFrom(dailySchedules);
+        return DailyScheduleMapper.mapFrom(dailySchedules);
     }
 
     @Override
     public List<DailyScheduleDto> getDailySchedulesByParkingLot(int parkingLotId) {
         List<DailySchedule> dailySchedules = dailyScheduleRepository.findByParkingLot(parkingLotId);
-        return dailyScheduleMapper.mapFrom(dailySchedules);
+        return DailyScheduleMapper.mapFrom(dailySchedules);
     }
 }

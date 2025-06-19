@@ -91,14 +91,14 @@ public class StandardReservationServiceImpl implements StandardReservationServic
                 .orElseThrow(() -> new ResourceNotFoundException("Standard reservation not found with id: " + id));
 
         // Update only the allowed fields
-        if (standardReservationDto.scheduledDateTime() != null) {
-            existingReservation.setScheduledDateTime(standardReservationDto.scheduledDateTime());
+        if (standardReservationDto.getScheduledDateTime() != null) {
+            existingReservation.setScheduledDateTime(standardReservationDto.getScheduledDateTime());
         }
-        if (standardReservationDto.plate() != null) {
-            existingReservation.setPlate(standardReservationDto.plate());
+        if (standardReservationDto.getPlate() != null) {
+            existingReservation.setPlate(standardReservationDto.getPlate());
         }
-        if (standardReservationDto.slot() != null) {
-            existingReservation.setSlot(standardReservationDto.slot());
+        if (standardReservationDto.getSlot() != null) {
+            existingReservation.setSlot(standardReservationDto.getSlot());
         }
 
         StandardReservation updatedReservation = standardReservationRepository.save(existingReservation);

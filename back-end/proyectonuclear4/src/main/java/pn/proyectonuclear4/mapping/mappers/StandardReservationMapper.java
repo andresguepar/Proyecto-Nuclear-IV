@@ -8,18 +8,18 @@ import java.util.stream.Collectors;
 
 public class StandardReservationMapper {
     public static StandardReservationDto mapFrom(StandardReservation source) {
-        return new StandardReservationDto(
-                source.getIdStandardReservation(),
-                source.getSlot(),
-                source.getUser(),
-                source.getPayment(),
-                source.getScheduledDateTime(),
-                source.getCheckIn(),
-                source.getCheckOut(),
-                source.getReservationDate(),
-                source.getPlate(),
-                source.getStatusReservation()
-        );
+        return StandardReservationDto.builder()
+                .idStandardReservation(source.getIdStandardReservation())
+                .slot(source.getSlot())
+                .user(source.getUser())
+                .payment(source.getPayment())
+                .scheduledDateTime(source.getScheduledDateTime())
+                .checkIn(source.getCheckIn())
+                .checkOut(source.getCheckOut())
+                .reservationDate(source.getReservationDate())
+                .plate(source.getPlate())
+                .statusReservation(source.getStatusReservation())
+                .build();
     }
 
     public static StandardReservation mapFrom(StandardReservationDto source) {

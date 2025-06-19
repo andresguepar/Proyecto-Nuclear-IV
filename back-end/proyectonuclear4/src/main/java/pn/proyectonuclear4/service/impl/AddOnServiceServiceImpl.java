@@ -30,7 +30,7 @@ public class AddOnServiceServiceImpl implements AddOnServiceService {
     @Override
     public Optional<AddOnServiceDto> getAddOnServiceById(int id) {
         Optional<AddOnService> addOnService = addOnServiceRepository.findById(id);
-        return addOnService.map(addOnServiceMapper::mapFrom);
+        return addOnService.map(AddOnServiceMapper::mapFrom);
     }
 
     @Override
