@@ -18,8 +18,8 @@ public class WeekDayMapper {
 
     public static WeekDay mapFrom(WeekDayDto source) {
         return WeekDay.builder()
-                .idWeekDay(source.idWeekDay())
-                .name(source.name())
+                .idWeekDay(source.getIdWeekDay())
+                .name(source.getName())
                 .build();
     }
 

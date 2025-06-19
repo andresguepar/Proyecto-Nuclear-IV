@@ -21,11 +21,11 @@ public class AddOnServiceFeeMapper {
 
     public static AddOnServiceFee mapFrom(AddOnServiceFeeDto source) {
         return AddOnServiceFee.builder()
-                .idAddOnServiceFee(source.idAddOnServiceFee())
-                .total(source.total())
-                .addOnServices(source.addOnServices())
-                .isActive(source.isActive())
-                .standardReservation(source.standardReservation())
+                .idAddOnServiceFee(source.getIdAddOnServiceFee())
+                .total(source.getTotal())
+                .addOnServices(source.getAddOnServices())
+                .isActive(source.getIsActive())
+                .standardReservation(source.getStandardReservation())
                 .build();
     }
 

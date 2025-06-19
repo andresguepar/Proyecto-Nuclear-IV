@@ -17,9 +17,9 @@ public class StatusReservationMapper {
 
     public static StatusReservation mapFrom(StatusReservationDto source) {
         return StatusReservation.builder()
-                .idStatusReservation(source.idStatusReservation())
-                .name(source.name())
-                .isActive(source.isActive())
+                .idStatusReservation(source.getIdStatusReservation())
+                .name(source.getName())
+                .isActive(source.getIsActive())
                 .build();
     }
 

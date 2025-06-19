@@ -19,9 +19,9 @@ public class RoleMapper {
 
     public static Role mapFrom(RoleDto source) {
         return Role.builder()
-                .idRole(source.idRole())
-                .name(source.name())
-                .isActive(source.isActive())
+                .idRole(source.getIdRole())
+                .name(source.getName())
+                .isActive(source.getIsActive())
                 .build();
     }
 

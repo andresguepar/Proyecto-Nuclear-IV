@@ -24,16 +24,16 @@ public class StandardReservationMapper {
 
     public static StandardReservation mapFrom(StandardReservationDto source) {
         return StandardReservation.builder()
-                .idStandardReservation(source.idStandardReservation())
-                .slot(source.slot())
-                .user(source.user())
-                .payment(source.payment())
-                .scheduledDateTime(source.scheduledDateTime())
-                .checkIn(source.checkIn())
-                .checkOut(source.checkOut())
-                .reservationDate(source.reservationDate())
-                .plate(source.plate())
-                .statusReservation(source.statusReservation())
+                .idStandardReservation(source.getIdStandardReservation())
+                .slot(source.getSlot())
+                .user(source.getUser())
+                .payment(source.getPayment())
+                .scheduledDateTime(source.getScheduledDateTime())
+                .checkIn(source.getCheckIn())
+                .checkOut(source.getCheckOut())
+                .reservationDate(source.getReservationDate())
+                .plate(source.getPlate())
+                .statusReservation(source.getStatusReservation())
                 .build();
     }
 

@@ -23,13 +23,13 @@ public class FeeMapper {
 
     public static Fee mapFrom(FeeDto source) {
         return Fee.builder()
-                .idFee(source.idFee())
-                .name(source.name())
-                .description(source.description())
-                .total(source.total())
-                .standardFee(source.standardFee())
-                .monthlyFee(source.monthlyFee())
-                .addOnServiceFee(source.addOnServiceFee())
+                .idFee(source.getIdFee())
+                .name(source.getName())
+                .description(source.getDescription())
+                .total(source.getTotal())
+                .standardFee(source.getStandardFee())
+                .monthlyFee(source.getMonthlyFee())
+                .addOnServiceFee(source.getAddOnServiceFee())
                 .build();
     }
 

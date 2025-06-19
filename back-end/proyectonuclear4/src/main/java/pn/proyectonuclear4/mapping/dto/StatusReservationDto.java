@@ -1,7 +1,13 @@
 package pn.proyectonuclear4.mapping.dto;
 
-public record StatusReservationDto(
-        int idStatusReservation,
-        String name,
-        Boolean isActive
-) {}
+import lombok.Builder;
+import lombok.Data;
+
+@Data
+@Builder
+public class StatusReservationDto{
+        private int idStatusReservation;
+        private String name;
+        private Boolean isActive;
+
+}

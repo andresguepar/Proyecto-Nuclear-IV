@@ -19,9 +19,9 @@ public class ScheduleMapper {
 
     public static Schedule mapFrom(ScheduleDto source) {
         return Schedule.builder()
-                .idSchedule(source.idSchedule())
-                .parkingLot(source.parkingLot())
-                .isActive(source.isActive())
+                .idSchedule(source.getIdSchedule())
+                .parkingLot(source.getParkingLot())
+                .isActive(source.getIsActive())
                 .build();
     }
 

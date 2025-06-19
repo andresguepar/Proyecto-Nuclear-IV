@@ -1,10 +1,11 @@
 package pn.proyectonuclear4.mapping.dto;
 
 import lombok.Builder;
+import lombok.Data;
 
+@Data
 @Builder
-public record WeekDayDto(
-        int idWeekDay,
-        String name
-) {
+public class WeekDayDto{
+        private int idWeekDay;
+        private String name;
 }

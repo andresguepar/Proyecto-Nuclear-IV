@@ -25,15 +25,15 @@ public class MonthlyReservationMapper {
 
     public static MonthlyReservation mapFrom(MonthlyReservationDto source) {
         return MonthlyReservation.builder()
-                .idMonthlyReservation(source.idMonthlyReservation())
-                .slot(source.slot())
-                .user(source.user())
-                .payment(source.payment())
-                .reservationDate(source.reservationDate())
-                .startDate(source.startDate())
-                .endDate(source.endDate())
-                .plate(source.plate())
-                .statusReservation(source.statusReservation())
+                .idMonthlyReservation(source.getIdMonthlyReservation())
+                .slot(source.getSlot())
+                .user(source.getUser())
+                .payment(source.getPayment())
+                .reservationDate(source.getReservationDate())
+                .startDate(source.getStartDate())
+                .endDate(source.getEndDate())
+                .plate(source.getPlate())
+                .statusReservation(source.getStatusReservation())
                 .build();
     }
 
