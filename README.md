@@ -11,7 +11,6 @@ Spot-n-Park es una aplicación web para la gestión de estacionamientos, reserva
   - [Back-end](#back-end)
   - [Front-end](#front-end)
 - [Uso](#uso)
-- [Contribución](#contribución)
 - [Licencia](#licencia)
 
 ---
@@ -83,10 +82,6 @@ Proyecto-Nuclear-IV/
 1. Inicia el back-end y el front-end como se indica arriba.
 2. Accede a la aplicación web en `http://localhost:5173` (o el puerto que indique Vite).
 3. Regístrate o inicia sesión para comenzar a gestionar reservas, usuarios, pagos y más.
-
-## Contribución
-
-¡Las contribuciones son bienvenidas! Por favor, abre un issue o un pull request para sugerir mejoras o reportar errores.
 
 ## Licencia
 
