@@ -10,8 +10,13 @@ import pn.proyectonuclear4.service.SlotService;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controlador REST para la gestión de slots o espacios de parqueo (Slot).
+ * Permite crear, consultar, actualizar y eliminar slots,
+ * así como filtrarlos por estado, parqueadero y tipo de vehículo.
+ */
 @RestController
-@RequestMapping("/slots")
+@RequestMapping("/Slots")
 public class SlotController {
 
     @Autowired

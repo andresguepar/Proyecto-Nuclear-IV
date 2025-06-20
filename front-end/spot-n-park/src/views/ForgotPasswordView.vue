@@ -28,7 +28,7 @@ const submit = () => {
         <img src="@/assets/images/spotnpark-logo-home.png" alt="SpotnPark Logo" class="w-[36rem] max-w-2xl" />
       </div>
       <!-- Columna derecha: Formulario con degradado -->
-      <div class="flex w-full md:w-1/2 items-center justify-center bg-gradient-to-tr from-white via-blue-200 to-orange-100">
+      <div class="flex w-full md:w-1/2 items-center justify-center bg-gradient-to-tr from-white via-[#0D2F78]/20 to-orange-100">
         <CardBox class="w-11/12 md:w-8/12 lg:w-7/12 xl:w-5/12 shadow-2xl" is-form @submit.prevent="submit">
           <h2 class="text-2xl font-bold mb-6 text-center">Recuperar contraseña</h2>
           <FormField label="Usuario" help="Ingresa tu usuario para recuperar tu contraseña">

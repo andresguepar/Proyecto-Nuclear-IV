@@ -1,7 +1,7 @@
 package pn.proyectonuclear4.service;
 
-import pn.proyectonuclear4.mapping.dto.StandardReservationDto;
 import pn.proyectonuclear4.exception.ResourceNotFoundException;
+import pn.proyectonuclear4.mapping.dto.StandardReservationDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,13 +25,13 @@ public interface StandardReservationService {
 
     // Nuevos métodos para el flujo de confirmación
     StandardReservationDto confirmReservation(int id) throws ResourceNotFoundException;
-    
+
     StandardReservationDto adminConfirmReservation(int id) throws ResourceNotFoundException;
-    
+
     StandardReservationDto startReservation(int id) throws ResourceNotFoundException;
-    
+
     StandardReservationDto completeReservation(int id) throws ResourceNotFoundException;
-    
+
     StandardReservationDto processPayment(int id, int paymentMethodId) throws ResourceNotFoundException;
 
     List<StandardReservationDto> getStandardReservationsByParkingLotAdmin(int adminId);

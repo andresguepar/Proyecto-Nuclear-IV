@@ -5,11 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZonedDateTime;
 
 @Data
 @Entity
@@ -45,4 +42,4 @@ public class MonthlyReservation {
     @ManyToOne
     @JoinColumn(name = "status_reservation_id")
     private StatusReservation statusReservation;
-} 
+}

@@ -13,8 +13,6 @@ import pn.proyectonuclear4.service.SlotService;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 public class SlotServiceImpl implements SlotService {

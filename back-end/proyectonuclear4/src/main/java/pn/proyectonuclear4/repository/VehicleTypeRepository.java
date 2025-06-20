@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository;
 import pn.proyectonuclear4.entity.VehicleType;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface VehicleTypeRepository extends JpaRepository<VehicleType, Integer> {

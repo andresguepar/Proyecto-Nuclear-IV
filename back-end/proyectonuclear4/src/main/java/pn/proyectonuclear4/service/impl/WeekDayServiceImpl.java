@@ -1,12 +1,12 @@
 package pn.proyectonuclear4.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import pn.proyectonuclear4.entity.WeekDay;
 import pn.proyectonuclear4.mapping.dto.WeekDayDto;
 import pn.proyectonuclear4.mapping.mappers.WeekDayMapper;
 import pn.proyectonuclear4.repository.WeekDayRepository;
 import pn.proyectonuclear4.service.WeekDayService;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;

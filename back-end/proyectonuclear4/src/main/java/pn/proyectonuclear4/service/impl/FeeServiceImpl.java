@@ -3,7 +3,6 @@ package pn.proyectonuclear4.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pn.proyectonuclear4.entity.Fee;
-import pn.proyectonuclear4.exception.ResourceNotFoundException;
 import pn.proyectonuclear4.mapping.dto.FeeDto;
 import pn.proyectonuclear4.mapping.mappers.FeeMapper;
 import pn.proyectonuclear4.repository.FeeRepository;
@@ -11,8 +10,6 @@ import pn.proyectonuclear4.service.FeeService;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 public class FeeServiceImpl implements FeeService {

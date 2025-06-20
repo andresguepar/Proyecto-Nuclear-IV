@@ -10,6 +10,11 @@ import pn.proyectonuclear4.service.DailyScheduleService;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controlador REST para la gestión de los horarios diarios (DailySchedule).
+ * Permite crear, consultar, actualizar y eliminar horarios diarios,
+ * así como filtrarlos por estado, día de la semana, parqueadero y combinación de ambos.
+ */
 @RestController
 @RequestMapping("/DailySchedules")
 public class DailyScheduleController {
@@ -48,6 +53,7 @@ public class DailyScheduleController {
     public ResponseEntity<List<DailyScheduleDto>> getByStatus(@RequestParam Boolean isActive) {
         return ResponseEntity.ok(dailyScheduleService.getDailySchedulesByIsActive(isActive));
     }
+
 
     @GetMapping("/filter/by-schedule-weekday")
     public ResponseEntity<List<DailyScheduleDto>> getByScheduleAndWeekDay(

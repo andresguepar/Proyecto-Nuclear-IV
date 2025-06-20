@@ -1,12 +1,12 @@
 package pn.proyectonuclear4.service.impl;
 
-import pn.proyectonuclear4.config.CustomUserDetails;
-import pn.proyectonuclear4.entity.User;
-import pn.proyectonuclear4.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import pn.proyectonuclear4.config.CustomUserDetails;
+import pn.proyectonuclear4.entity.User;
+import pn.proyectonuclear4.repository.UserRepository;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {

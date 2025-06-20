@@ -32,6 +32,6 @@ const colorClasses = {
   success: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
   danger: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
   warning: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-  info: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
+  info: 'bg-[#0D2F78]/10 text-[#0D2F78] dark:bg-[#0B245A] dark:text-[#0D2F78]'
 }
 </script> 

@@ -7,7 +7,7 @@
       @apply aside-scrollbars-light;
     }
     .aside-menu-item {
-      @apply text-blue-600 hover:text-black;
+      @apply text-[#0D2F78] hover:text-black;
     }
     .aside-menu-item-active {
       @apply text-black;
@@ -16,7 +16,7 @@
       @apply bg-gray-100/75;
     }
     .navbar-item-label {
-      @apply text-blue-600;
+      @apply text-[#0D2F78];
     }
     .navbar-item-label-hover {
       @apply hover:text-black;

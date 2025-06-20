@@ -11,6 +11,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controlador REST para la gestión de reservas mensuales (MonthlyReservation).
+ * Permite crear, consultar, actualizar y eliminar reservas mensuales,
+ * así como filtrarlas por usuario, estado y parqueadero.
+ */
 @RestController
 @RequestMapping("/MonthlyReservations")
 public class MonthlyReservationController {

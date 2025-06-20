@@ -2,10 +2,10 @@ package pn.proyectonuclear4.mapping.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import pn.proyectonuclear4.entity.Slot;
-import pn.proyectonuclear4.entity.User;
 import pn.proyectonuclear4.entity.Payment;
+import pn.proyectonuclear4.entity.Slot;
 import pn.proyectonuclear4.entity.StatusReservation;
+import pn.proyectonuclear4.entity.User;
 
 import java.time.LocalDateTime;
 

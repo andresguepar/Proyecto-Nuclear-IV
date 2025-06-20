@@ -10,6 +10,11 @@ import pn.proyectonuclear4.service.StandardFeeService;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controlador REST para la gestión de tarifas estándar (StandardFee).
+ * Permite crear, consultar, actualizar y eliminar tarifas estándar,
+ * así como filtrarlas por estado, parqueadero y tipo de vehículo.
+ */
 @RestController
 @RequestMapping("/standard-fees")
 public class StandardFeeController {

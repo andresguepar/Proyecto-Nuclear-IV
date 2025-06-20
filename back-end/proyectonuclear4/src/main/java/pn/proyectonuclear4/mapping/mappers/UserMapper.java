@@ -1,6 +1,5 @@
 package pn.proyectonuclear4.mapping.mappers;
 
-import pn.proyectonuclear4.entity.Role;
 import pn.proyectonuclear4.entity.User;
 import pn.proyectonuclear4.mapping.dto.UserDto;
 

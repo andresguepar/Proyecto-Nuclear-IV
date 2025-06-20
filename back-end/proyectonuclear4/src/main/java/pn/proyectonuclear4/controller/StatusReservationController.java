@@ -10,6 +10,11 @@ import pn.proyectonuclear4.service.StatusReservationService;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controlador REST para la gestión de estados de reserva (StatusReservation).
+ * Permite crear, consultar, actualizar y eliminar estados de reserva,
+ * así como filtrarlos por estado activo/inactivo.
+ */
 @RestController
 @RequestMapping("/status-reservations")
 public class StatusReservationController {

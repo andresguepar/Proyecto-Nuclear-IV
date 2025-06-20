@@ -9,12 +9,9 @@ import pn.proyectonuclear4.mapping.mappers.ParkingLotMapper;
 import pn.proyectonuclear4.repository.ParkingLotRepository;
 import pn.proyectonuclear4.repository.UserRepository;
 import pn.proyectonuclear4.service.ParkingLotService;
-import pn.proyectonuclear4.service.UserService;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 public class ParkingLotServiceImpl implements ParkingLotService {

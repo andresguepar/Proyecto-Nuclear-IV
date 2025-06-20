@@ -1,13 +1,13 @@
 package pn.proyectonuclear4.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import pn.proyectonuclear4.entity.VehicleType;
 import pn.proyectonuclear4.exception.ResourceNotFoundException;
 import pn.proyectonuclear4.mapping.dto.VehicleTypeDto;
 import pn.proyectonuclear4.mapping.mappers.VehicleTypeMapper;
 import pn.proyectonuclear4.repository.VehicleTypeRepository;
 import pn.proyectonuclear4.service.VehicleTypeService;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;

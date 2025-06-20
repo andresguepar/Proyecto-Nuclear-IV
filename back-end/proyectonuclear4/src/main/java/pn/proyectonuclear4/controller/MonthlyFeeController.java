@@ -10,6 +10,11 @@ import pn.proyectonuclear4.service.MonthlyFeeService;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controlador REST para la gestión de tarifas mensuales (MonthlyFee).
+ * Permite crear, consultar, actualizar y eliminar tarifas mensuales,
+ * así como filtrarlas por estado.
+ */
 @RestController
 @RequestMapping("/MonthlyFees")
 public class MonthlyFeeController {

@@ -1,8 +1,8 @@
 package pn.proyectonuclear4.mapping.mappers;
 
+import lombok.Builder;
 import pn.proyectonuclear4.entity.Schedule;
 import pn.proyectonuclear4.mapping.dto.ScheduleDto;
-import lombok.Builder;
 
 import java.util.List;
 import java.util.stream.Collectors;

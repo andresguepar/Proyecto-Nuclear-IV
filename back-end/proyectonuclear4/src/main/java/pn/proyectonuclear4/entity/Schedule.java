@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalTime;
-
 @Entity
 @Data
 @Table(name = "schedules")
@@ -24,4 +22,4 @@ public class Schedule {
     private ParkingLot parkingLot;
 
     private Boolean isActive;
-} 
+}

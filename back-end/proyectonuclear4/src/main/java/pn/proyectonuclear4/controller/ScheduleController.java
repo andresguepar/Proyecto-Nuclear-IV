@@ -10,8 +10,13 @@ import pn.proyectonuclear4.service.ScheduleService;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controlador REST para la gestión de horarios generales (Schedule).
+ * Permite crear, consultar, actualizar y eliminar horarios,
+ * así como filtrarlos por estado y por parqueadero.
+ */
 @RestController
-@RequestMapping("/schedules")
+@RequestMapping("/Schedules")
 public class ScheduleController {
 
     @Autowired

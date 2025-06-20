@@ -8,11 +8,16 @@ import pn.proyectonuclear4.mapping.dto.StandardReservationDto;
 import pn.proyectonuclear4.service.StandardReservationService;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.HashMap;
 
+/**
+ * Controlador REST para la gestión de reservas estándar (StandardReservation).
+ * Permite crear, consultar, actualizar y eliminar reservas estándar,
+ * así como filtrarlas por usuario, estado, parqueadero y slot.
+ */
 @RestController
 @RequestMapping("/standard-reservations")
 public class StandardReservationController {
@@ -139,17 +144,17 @@ public class StandardReservationController {
     @GetMapping("/debug/admin-info/{adminId}")
     public ResponseEntity<Map<String, Object>> debugAdminInfo(@PathVariable int adminId) {
         Map<String, Object> debugInfo = new HashMap<>();
-        
+
         try {
             // Contar parking lots del admin
             int parkingLotsCount = standardReservationService.countParkingLotsByAdmin(adminId);
             debugInfo.put("adminId", adminId);
             debugInfo.put("parkingLotsCount", parkingLotsCount);
-            
+
             // Obtener reservas con consulta original
             List<StandardReservationDto> reservationsOriginal = standardReservationService.getStandardReservationsByParkingLotAdmin(adminId);
             debugInfo.put("reservationsCount", reservationsOriginal.size());
-            
+
             return ResponseEntity.ok(debugInfo);
         } catch (Exception e) {
             debugInfo.put("error", e.getMessage());

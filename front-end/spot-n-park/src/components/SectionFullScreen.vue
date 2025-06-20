@@ -18,7 +18,7 @@ const colorClass = computed(() => {
 
   switch (props.bg) {
     case 'brand':
-      return 'bg-gradient-to-tr from-white via-blue-200 to-orange-100';
+      return 'bg-gradient-to-tr from-white via-[#0D2F78]/20 to-orange-100';
     case 'purplePink':
       return gradientBgPurplePink
     case 'pinkRed':

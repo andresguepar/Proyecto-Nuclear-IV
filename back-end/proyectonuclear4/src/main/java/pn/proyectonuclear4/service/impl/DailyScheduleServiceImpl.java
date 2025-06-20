@@ -3,19 +3,14 @@ package pn.proyectonuclear4.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pn.proyectonuclear4.entity.DailySchedule;
-import pn.proyectonuclear4.entity.Schedule;
-import pn.proyectonuclear4.entity.WeekDay;
 import pn.proyectonuclear4.exception.ResourceNotFoundException;
 import pn.proyectonuclear4.mapping.dto.DailyScheduleDto;
 import pn.proyectonuclear4.mapping.mappers.DailyScheduleMapper;
 import pn.proyectonuclear4.repository.DailyScheduleRepository;
-import pn.proyectonuclear4.repository.ScheduleRepository;
-import pn.proyectonuclear4.repository.WeekDayRepository;
 import pn.proyectonuclear4.service.DailyScheduleService;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class DailyScheduleServiceImpl implements DailyScheduleService {
@@ -39,7 +34,7 @@ public class DailyScheduleServiceImpl implements DailyScheduleService {
     @Override
     public DailyScheduleDto saveDailySchedule(DailyScheduleDto dailyScheduleDto) {
         DailySchedule dailySchedule = DailyScheduleMapper.mapFrom(dailyScheduleDto);
-        
+
         // Asegurarse de que los tiempos estén en formato LocalTime
         if (dailyScheduleDto.getStartTime() != null) {
             dailySchedule.setStartTime(dailyScheduleDto.getStartTime());
@@ -47,7 +42,7 @@ public class DailyScheduleServiceImpl implements DailyScheduleService {
         if (dailyScheduleDto.getEndTime() != null) {
             dailySchedule.setEndTime(dailyScheduleDto.getEndTime());
         }
-        
+
         DailySchedule savedDailySchedule = dailyScheduleRepository.save(dailySchedule);
         return DailyScheduleMapper.mapFrom(savedDailySchedule);
     }

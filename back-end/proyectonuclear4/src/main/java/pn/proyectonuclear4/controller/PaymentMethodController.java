@@ -10,6 +10,11 @@ import pn.proyectonuclear4.service.PaymentMethodService;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controlador REST para la gestión de métodos de pago (PaymentMethod).
+ * Permite crear, consultar, actualizar y eliminar métodos de pago,
+ * así como filtrarlos por estado.
+ */
 @RestController
 @RequestMapping("/PaymentMethods")
 public class PaymentMethodController {

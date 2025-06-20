@@ -19,7 +19,7 @@
             <button
               class="px-4 py-1.5 text-sm font-medium border-b-2 transition-colors duration-150"
               :class="{
-                'border-blue-500 text-blue-600': activeTab === 'standart',
+                'border-[#0D2F78] text-[#0D2F78]': activeTab === 'standart',
                 'border-transparent hover:border-gray-300': activeTab !== 'standart',
               }"
               @click="activeTab = 'standart'"
@@ -29,7 +29,7 @@
             <button
               class="px-4 py-1.5 text-sm font-medium border-b-2 transition-colors duration-150"
               :class="{
-                'border-blue-500 text-blue-600': activeTab === 'monthly',
+                'border-[#0D2F78] text-[#0D2F78]': activeTab === 'monthly',
                 'border-transparent hover:border-gray-300': activeTab !== 'monthly',
               }"
               @click="activeTab = 'monthly'"
@@ -78,7 +78,7 @@
                   <h3 class="text-sm font-semibold text-gray-800 mb-1">{{ lot.name }}</h3>
                   <!-- Precio más prominente -->
                   <div v-if="selectedVehicleType" class="mb-2">
-                    <p class="text-lg font-bold text-blue-600">
+                    <p class="text-lg font-bold text-[#0D2F78]">
                       {{ lot.price }}
                     </p>
                     <p class="text-xs text-gray-500">
@@ -522,7 +522,7 @@ const updateMapMarkers = () => {
         // InfoWindow solo si hay datos extendidos (cards filtradas)
         let infoContent = `<div class='p-3 max-w-xs'><h3 class='font-semibold text-base mb-1'>${lot.name}</h3><div class='space-y-1'><p class='text-sm text-gray-600'>${lot.address || ''}</p>`
         if (showParkingLots.value && lot.selectedVehicleTypeName) {
-          infoContent += `<p class='text-base font-bold text-blue-600'>${lot.price}</p><p class='text-xs text-gray-500'>${lot.selectedVehicleTypeName}</p>`
+          infoContent += `<p class='text-base font-bold text-[#0D2F78]'>${lot.price}</p><p class='text-xs text-gray-500'>${lot.selectedVehicleTypeName}</p>`
         }
         infoContent += `</div></div>`
         const infoWindow = new google.maps.InfoWindow({

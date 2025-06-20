@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { reservationAddOnServicesService } from './reservationAddOnServicesService'
 
 const API_URL = 'http://localhost:8080/standard-reservations'
 
@@ -11,7 +12,28 @@ export const reservationsService = {
 
   async getUserReservations(userId) {
     const response = await axios.get(`${API_URL}/user/${userId}`)
-    return response.data
+    const reservations = response.data
+    
+    // Fetch add-on services for each reservation
+    const reservationsWithServices = await Promise.all(
+      reservations.map(async (reservation) => {
+        try {
+          const addOnServices = await reservationAddOnServicesService.getActiveByReservationId(reservation.idStandardReservation)
+          return {
+            ...reservation,
+            addOnServices
+          }
+        } catch (error) {
+          console.error(`Error fetching add-on services for reservation ${reservation.idStandardReservation}:`, error)
+          return {
+            ...reservation,
+            addOnServices: []
+          }
+        }
+      })
+    )
+    
+    return reservationsWithServices
   },
 
   async confirmReservation(reservationId) {
@@ -51,7 +73,28 @@ export const reservationsService = {
 
   async getParkingLotAdminReservations(adminId) {
     const response = await axios.get(`${API_URL}/parking-lot-admin/${adminId}`)
-    return response.data
+    const reservations = response.data
+    
+    // Fetch add-on services for each reservation
+    const reservationsWithServices = await Promise.all(
+      reservations.map(async (reservation) => {
+        try {
+          const addOnServices = await reservationAddOnServicesService.getActiveByReservationId(reservation.idStandardReservation)
+          return {
+            ...reservation,
+            addOnServices
+          }
+        } catch (error) {
+          console.error(`Error fetching add-on services for reservation ${reservation.idStandardReservation}:`, error)
+          return {
+            ...reservation,
+            addOnServices: []
+          }
+        }
+      })
+    )
+    
+    return reservationsWithServices
   },
 
   async userRequestStart(reservationId) {

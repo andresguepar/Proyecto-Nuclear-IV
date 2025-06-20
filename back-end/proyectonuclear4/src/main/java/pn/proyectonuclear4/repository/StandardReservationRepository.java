@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import pn.proyectonuclear4.entity.MonthlyReservation;
 import pn.proyectonuclear4.entity.StandardReservation;
 import pn.proyectonuclear4.entity.StatusReservation;
 import pn.proyectonuclear4.entity.User;

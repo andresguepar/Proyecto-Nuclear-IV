@@ -1,8 +1,8 @@
 package pn.proyectonuclear4.mapping.mappers;
 
+import lombok.Builder;
 import pn.proyectonuclear4.entity.Fee;
 import pn.proyectonuclear4.mapping.dto.FeeDto;
-import lombok.Builder;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +17,7 @@ public class FeeMapper {
                 .total(source.getTotal())
                 .standardFee(source.getStandardFee())
                 .monthlyFee(source.getMonthlyFee())
-                .addOnServiceFee(source.getAddOnServiceFee())
+                .addOnService(source.getAddOnService())
                 .build();
     }
 
@@ -29,7 +29,7 @@ public class FeeMapper {
                 .total(source.getTotal())
                 .standardFee(source.getStandardFee())
                 .monthlyFee(source.getMonthlyFee())
-                .addOnServiceFee(source.getAddOnServiceFee())
+                .addOnService(source.getAddOnService())
                 .build();
     }
 

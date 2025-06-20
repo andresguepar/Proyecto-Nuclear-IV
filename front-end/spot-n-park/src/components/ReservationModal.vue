@@ -1,9 +1,9 @@
 <template>
   <transition name="fade">
     <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-2xl w-full mx-4 p-8 relative border-2 border-blue-400">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-2xl w-full mx-4 p-8 relative border-2 border-[#0D2F78]">
         <button class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold" @click="emit('update:show', false)">&times;</button>
-        <h2 class="text-2xl font-bold text-blue-700 mb-6 text-center">Reservar Parqueadero</h2>
+        <h2 class="text-2xl font-bold text-[#0D2F78] mb-6 text-center">Reservar Parqueadero</h2>
         <div class="flex flex-col md:flex-row gap-8 min-h-[400px]">
           <!-- Left: Parking lot and reservation details -->
           <div class="flex-1 space-y-3 p-2">
@@ -40,7 +40,7 @@
                 <input type="checkbox" :id="'service-' + service.id" v-model="selectedAddOnsProxy" :value="service" class="mr-2" />
                 <label :for="'service-' + service.id">{{ service.name }} - ${{ service.price }}</label>
               </div>
-              <div class="mt-2 font-semibold text-blue-700">Total servicios: ${{ props.addOnServicesTotal }}</div>
+              <div class="mt-2 font-semibold text-[#0D2F78]">Total servicios: ${{ props.addOnServicesTotal }}</div>
             </div>
             <div v-else class="text-gray-500">No hay servicios adicionales disponibles.</div>
             <div class="mt-6">
@@ -66,7 +66,7 @@ import BaseButton from '@/components/BaseButton.vue'
 import { slotsService } from '@/services/slotsService'
 import { parkingLotsService } from '@/services/parkingLotsService'
 import { reservationsService } from '@/services/reservationsService'
-import { addOnServiceFeesService } from '@/services/addOnServiceFeesService'
+import { reservationAddOnServicesService } from '@/services/reservationAddOnServicesService'
 import { useAuthStore } from '@/stores/auth.js'
 import { useRouter } from 'vue-router'
 
@@ -184,21 +184,22 @@ const handleReserve = async () => {
     alert('Ocurrió un error al guardar la reserva. Intenta de nuevo más tarde.')
     return
   }
-  // 2. Guardar add_on_services_fees si hay servicios seleccionados
+  // 2. Guardar servicios adicionales si hay servicios seleccionados
   if (selectedAddOnsProxy.value.length > 0 && reservationResponse && reservationResponse.idStandardReservation) {
     try {
-      const addOnServiceFeeData = {
-        total: selectedAddOnsProxy.value.reduce((acc, s) => acc + (s.price || 0), 0),
-        addOnServices: JSON.stringify(selectedAddOnsProxy.value.map(s => ({
-          idAddOnService: s.id,
-          name: s.name,
-          price: s.price
-        }))),
-        isActive: true,
-        standardReservation: reservationResponse
-      }
-      console.log('Payload AddOnServiceFee:', addOnServiceFeeData)
-      await addOnServiceFeesService.createAddOnServiceFee(addOnServiceFeeData)
+      const addOnServicesData = selectedAddOnsProxy.value.map(service => ({
+        addOnService: {
+          idAddOnService: service.id
+        },
+        price: service.price,
+        isActive: true
+      }))
+      
+      console.log('Payload AddOnServices:', addOnServicesData)
+      await reservationAddOnServicesService.saveMultipleForReservation(
+        reservationResponse.idStandardReservation, 
+        addOnServicesData
+      )
     } catch (error) {
       console.error('Error al guardar servicios adicionales:', error)
       alert('La reserva fue guardada, pero ocurrió un error al guardar los servicios adicionales.')

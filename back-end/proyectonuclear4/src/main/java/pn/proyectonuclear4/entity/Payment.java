@@ -1,12 +1,12 @@
 package pn.proyectonuclear4.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Data
 @Entity
@@ -30,4 +30,4 @@ public class Payment {
     @ManyToOne
     @JoinColumn(name = "fee_id")
     private Fee fee;
-} 
+}

@@ -3,10 +3,7 @@ package pn.proyectonuclear4.mapping.mappers;
 import lombok.Builder;
 import pn.proyectonuclear4.entity.DailySchedule;
 import pn.proyectonuclear4.mapping.dto.DailyScheduleDto;
-import org.springframework.stereotype.Component;
-import pn.proyectonuclear4.mapping.dto.SlotDto;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -60,10 +60,10 @@ function reloadOnLogin(e) {
         </template>
         <template v-else>
           <div class="flex items-center px-4 py-2">
-            <router-link to="/login" class="text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mr-4" @click.native="reloadOnLogin">
+            <router-link to="/login" class="text-sm font-medium text-[#0D2F78] hover:text-[#0B245A] mr-4" @click.native="reloadOnLogin">
               Iniciar Sesión
             </router-link>
-            <router-link to="/register" class="text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+            <router-link to="/register" class="text-sm font-medium text-[#0D2F78] hover:text-[#0B245A]">
               Registrarse
             </router-link>
           </div>

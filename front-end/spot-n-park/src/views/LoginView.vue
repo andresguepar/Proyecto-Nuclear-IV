@@ -47,7 +47,7 @@ const goHome = () => {
         <img src="@/assets/images/spotnpark-logo-home.png" alt="SpotnPark Logo" class="w-[36rem] max-w-2xl" />
       </div>
       <!-- Columna derecha: Formulario con degradado -->
-      <div class="flex w-full md:w-1/2 items-center justify-center bg-gradient-to-tr from-white via-blue-200 to-orange-100">
+      <div class="flex w-full md:w-1/2 items-center justify-center bg-gradient-to-tr from-white via-[#0D2F78]/20 to-orange-100">
         <CardBox class="w-11/12 md:w-8/12 lg:w-7/12 xl:w-5/12 shadow-2xl" is-form @submit.prevent="submit">
           <FormField label="Login" help="Please enter your login">
             <FormControl
@@ -76,10 +76,10 @@ const goHome = () => {
           />
 
           <div class="w-full flex justify-end mt-2">
-            <router-link to="/forgot-password" class="text-blue-600 hover:underline text-sm font-medium">¿Olvidaste tu contraseña?</router-link>
+            <router-link to="/forgot-password" class="text-[#0D2F78] hover:underline text-sm font-medium">¿Olvidaste tu contraseña?</router-link>
           </div>
           <div class="w-full flex justify-end mt-2">
-            <router-link to="/register" class="text-blue-600 hover:underline text-sm font-medium">¿Aún no estás registrado? Regístrate aquí</router-link>
+            <router-link to="/register" class="text-[#0D2F78] hover:underline text-sm font-medium">¿Aún no estás registrado? Regístrate aquí</router-link>
           </div>
 
           <div v-if="error" class="w-full mb-4 p-2 bg-red-100 text-red-700 rounded text-center">

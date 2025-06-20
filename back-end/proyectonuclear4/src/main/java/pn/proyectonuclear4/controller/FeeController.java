@@ -9,8 +9,12 @@ import pn.proyectonuclear4.service.FeeService;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controlador REST para la gestión de tarifas (Fee).
+ * Permite crear, consultar y listar tarifas estándar, mensuales y de servicios adicionales.
+ */
 @RestController
-@RequestMapping("/Fees")
+@RequestMapping("/fees")
 public class FeeController {
 
     @Autowired

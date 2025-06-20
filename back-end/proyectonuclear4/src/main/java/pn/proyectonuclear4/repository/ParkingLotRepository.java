@@ -6,7 +6,6 @@ import pn.proyectonuclear4.entity.ParkingLot;
 import pn.proyectonuclear4.entity.User;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ParkingLotRepository extends JpaRepository<ParkingLot, Integer> {

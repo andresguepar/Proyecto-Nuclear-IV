@@ -6,9 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import pn.proyectonuclear4.entity.Payment;
 import pn.proyectonuclear4.entity.PaymentMethod;
-import pn.proyectonuclear4.entity.User;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository

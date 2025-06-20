@@ -10,8 +10,13 @@ import pn.proyectonuclear4.service.PaymentService;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controlador REST para la gestión de pagos (Payment).
+ * Permite crear, consultar y listar pagos realizados por los usuarios,
+ * así como filtrarlos por estado, método de pago y usuario.
+ */
 @RestController
-@RequestMapping("/payments")
+@RequestMapping("/Payments")
 public class PaymentController {
 
     @Autowired

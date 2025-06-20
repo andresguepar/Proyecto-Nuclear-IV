@@ -1,10 +1,10 @@
 package pn.proyectonuclear4.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
@@ -32,8 +32,6 @@ public class Fee {
     private MonthlyFee monthlyFee;
 
     @ManyToOne
-    @JoinColumn(name = "add_on_services_fee_id")
-    private AddOnServiceFee addOnServiceFee;
-
-
-} 
+    @JoinColumn(name = "add_on_service_id")
+    private AddOnService addOnService;
+}

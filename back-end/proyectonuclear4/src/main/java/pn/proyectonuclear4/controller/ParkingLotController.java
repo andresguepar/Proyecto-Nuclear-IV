@@ -10,6 +10,11 @@ import pn.proyectonuclear4.service.ParkingLotService;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controlador REST para la gestión de parqueaderos (ParkingLot).
+ * Permite crear, consultar, actualizar y eliminar parqueaderos,
+ * así como filtrarlos por estado y por administrador.
+ */
 @RestController
 @RequestMapping("/ParkingLots")
 public class ParkingLotController {

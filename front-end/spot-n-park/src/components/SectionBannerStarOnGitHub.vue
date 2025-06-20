@@ -12,7 +12,7 @@ import {gradientBgPinkRed} from '@/colors'
       <a
         href="https://github.com/spot-n-park"
         target="_blank"
-        class="text-blue-600 hover:underline"
+        class="text-[#0D2F78] hover:underline"
       >
         GitHub
       </a>

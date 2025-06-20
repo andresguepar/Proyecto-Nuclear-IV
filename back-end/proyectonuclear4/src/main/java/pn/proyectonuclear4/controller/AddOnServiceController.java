@@ -10,6 +10,11 @@ import pn.proyectonuclear4.service.AddOnServiceService;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controlador REST para la gestión de servicios adicionales (AddOnService).
+ * Permite crear, consultar, actualizar y eliminar servicios adicionales,
+ * así como filtrarlos por estado o por parqueadero asociado.
+ */
 @RestController
 @RequestMapping("/AddOnServices")
 public class AddOnServiceController {

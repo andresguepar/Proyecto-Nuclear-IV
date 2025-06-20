@@ -106,6 +106,24 @@
             </span>
           </div>
         </div>
+
+        <!-- Servicios adicionales -->
+        <div v-if="reservation.addOnServices && reservation.addOnServices.length > 0" class="mt-4">
+          <h4 class="text-lg font-semibold text-gray-800 mb-2">Servicios adicionales:</h4>
+          <div class="space-y-2">
+            <div v-for="service in reservation.addOnServices" :key="service.idReservationAddOnService" 
+                 class="flex justify-between items-center p-2 bg-gray-50 rounded">
+              <span class="text-sm text-gray-700">{{ service.addOnService?.name || 'Servicio' }}</span>
+              <span class="text-sm font-medium text-gray-800">${{ service.price }}</span>
+            </div>
+            <div class="border-t pt-2 flex justify-between items-center">
+              <span class="font-semibold text-gray-800">Total servicios:</span>
+              <span class="font-bold text-[#0D2F78]">
+                ${{ reservation.addOnServices.reduce((total, service) => total + (service.price || 0), 0) }}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </CardBoxComponentBody>
     <div class="p-4 border-t border-gray-100">
@@ -197,7 +215,7 @@ const getStatusClass = (status) => {
       return 'text-orange-600'
     case 'CONFIRMADA':
     case 'CONFIRMED':
-      return 'text-blue-600'
+      return 'text-[#0D2F78]'
     case 'EN CURSO':
     case 'IN PROGRESS':
     case 'EN_PROGRESO':

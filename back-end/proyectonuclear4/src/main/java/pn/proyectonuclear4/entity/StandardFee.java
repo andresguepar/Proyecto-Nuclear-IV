@@ -1,11 +1,10 @@
 package pn.proyectonuclear4.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import java.time.LocalTime;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
@@ -33,4 +32,4 @@ public class StandardFee {
     private Double priceForTwelveHours;
 
     private Boolean isActive;
-} 
+}

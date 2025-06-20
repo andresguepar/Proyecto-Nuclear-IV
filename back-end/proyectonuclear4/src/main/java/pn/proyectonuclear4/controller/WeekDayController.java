@@ -16,6 +16,42 @@ public class WeekDayController {
     @Autowired
     private WeekDayService weekDayService;
 
+/*Este es un controlador REST para manejar las operaciones relacionadas con los días de la semana en la aplicación.
+Permite obtener, guardar y consultar días de la semana específicos. Y se espera que muestre cada uno de los dias de
+la semana con su respectivo id y nombre. Tal como el siguiente objeto JSON:
+
+[
+  {
+    "idWeekDay": 1,
+    "name": "Lunes"
+  },
+  {
+    "idWeekDay": 2,
+    "name": "Martes"
+  },
+  {
+    "idWeekDay": 3,
+    "name": "Miércoles"
+  },
+  {
+    "idWeekDay": 4,
+    "name": "Jueves"
+  },
+  {
+    "idWeekDay": 5,
+    "name": "Viernes"
+  },
+  {
+    "idWeekDay": 6,
+    "name": "Sábado"
+  },
+  {
+    "idWeekDay": 7,
+    "name": "Domingo"
+  }
+
+  ]
+  */
     @GetMapping("/get")
     public ResponseEntity<List<WeekDayDto>> getAllWeekDays() {
         return ResponseEntity.ok(weekDayService.getAllWeekDays());

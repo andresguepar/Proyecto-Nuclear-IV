@@ -2,6 +2,7 @@ package pn.proyectonuclear4.entity;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+
 import java.util.Arrays;
 import java.util.stream.Collectors;
 

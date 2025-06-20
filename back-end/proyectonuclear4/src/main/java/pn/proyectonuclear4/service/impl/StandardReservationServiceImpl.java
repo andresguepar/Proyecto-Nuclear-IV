@@ -2,20 +2,15 @@ package pn.proyectonuclear4.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pn.proyectonuclear4.entity.StandardReservation;
-import pn.proyectonuclear4.entity.StatusReservation;
 import pn.proyectonuclear4.entity.Payment;
 import pn.proyectonuclear4.entity.PaymentMethod;
+import pn.proyectonuclear4.entity.StandardReservation;
+import pn.proyectonuclear4.entity.StatusReservation;
 import pn.proyectonuclear4.exception.ResourceNotFoundException;
 import pn.proyectonuclear4.mapping.dto.StandardReservationDto;
 import pn.proyectonuclear4.mapping.mappers.StandardReservationMapper;
-import pn.proyectonuclear4.repository.StandardReservationRepository;
-import pn.proyectonuclear4.repository.UserRepository;
-import pn.proyectonuclear4.repository.StatusReservationRepository;
-import pn.proyectonuclear4.repository.PaymentMethodRepository;
-import pn.proyectonuclear4.repository.PaymentRepository;
+import pn.proyectonuclear4.repository.*;
 import pn.proyectonuclear4.service.StandardReservationService;
-import pn.proyectonuclear4.service.impl.EmailServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -340,30 +335,30 @@ public class StandardReservationServiceImpl implements StandardReservationServic
     @Override
     public List<StandardReservationDto> getStandardReservationsByParkingLotAdmin(int adminId) {
         System.out.println("DEBUG: Buscando reservas para admin ID: " + adminId);
-        
+
         // Verificar si el admin tiene parking lots
         int parkingLotsCount = standardReservationRepository.countParkingLotsByAdmin(adminId);
         System.out.println("DEBUG: Parking lots del admin: " + parkingLotsCount);
-        
+
         // Usar la consulta original
         List<StandardReservation> standardReservations = standardReservationRepository.findByParkingLotAdmin(adminId);
         System.out.println("DEBUG: Reservas encontradas (consulta original): " + standardReservations.size());
-        
+
         // Usar la consulta de debug
         List<StandardReservation> standardReservationsDebug = standardReservationRepository.findByParkingLotAdminDebug(adminId);
         System.out.println("DEBUG: Reservas encontradas (consulta debug): " + standardReservationsDebug.size());
-        
+
         // Imprimir detalles de las reservas encontradas
         for (StandardReservation reservation : standardReservations) {
-            System.out.println("DEBUG: Reserva ID: " + reservation.getIdStandardReservation() + 
-                             ", Usuario: " + reservation.getUser().getUsername() + 
+            System.out.println("DEBUG: Reserva ID: " + reservation.getIdStandardReservation() +
+                             ", Usuario: " + reservation.getUser().getUsername() +
                              ", Parking Lot: " + reservation.getSlot().getParkingLot().getName() +
                              ", Admin ID: " + reservation.getSlot().getParkingLot().getAdmin().getIdUser());
         }
-        
+
         // Usar la consulta que funcione mejor
         List<StandardReservation> finalReservations = standardReservationsDebug.size() > 0 ? standardReservationsDebug : standardReservations;
-        
+
         return StandardReservationMapper.mapFrom(finalReservations);
     }
 

@@ -1,10 +1,10 @@
 package pn.proyectonuclear4.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
@@ -28,4 +28,4 @@ public class MonthlyFee {
     private Double price;
 
     private Boolean isActive;
-} 
+}
